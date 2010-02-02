@@ -1342,6 +1342,9 @@ int main(int argc, const char* argv[])
     top_InputFile = (char*)NULL;
     InputStream   = stdin;
   } else {
+    /*
+     * BOOKMARK. input file of SPASS here
+     */
     top_InputFile = argv[opts_Indicator()];
     InputStream = misc_OpenFile(top_InputFile, "r");
   }
@@ -1430,16 +1433,16 @@ int main(int argc, const char* argv[])
     /* Create labels for formulae without them */
     for (Scan = Axioms; !list_Empty(Scan); Scan = list_Cdr(Scan), Termcount++) {
       if (list_PairFirst(list_Car(Scan)) == NULL) {
-	char L[100];
-	char* Label;
-	sprintf(L, "axiom%d", Termcount);
-	Label = string_StringCopy(L);
-	list_Rplaca(list_Car(Scan), Label);
-	if (flag_GetFlagValue(Flags, flag_DOCPROOF) &&
-	    flag_GetFlagValue(Flags, flag_PLABELS)) {
-	  printf("\nAdded label %s for axiom \n", Label);
-	  fol_PrettyPrintDFG((TERM) list_PairSecond(list_Car(Scan)));
-	}
+	    char L[100];
+	    char* Label;
+	    sprintf(L, "axiom%d", Termcount);
+	    Label = string_StringCopy(L);
+	    list_Rplaca(list_Car(Scan), Label);
+	    if (flag_GetFlagValue(Flags, flag_DOCPROOF) &&
+	    	flag_GetFlagValue(Flags, flag_PLABELS)) {
+	      printf("\nAdded label %s for axiom \n", Label);
+	      fol_PrettyPrintDFG((TERM) list_PairSecond(list_Car(Scan)));
+	    }
       }
     }
     Termcount  = 0;
@@ -1450,9 +1453,9 @@ int main(int argc, const char* argv[])
       Label = string_StringCopy(L);
       list_Rplaca(list_Car(Scan), Label);
       if (flag_GetFlagValue(Flags, flag_DOCPROOF) &&
-	  flag_GetFlagValue(Flags, flag_PLABELS)) {
-	printf("\nAdded label %s for declaration \n", Label);
-	fol_PrettyPrintDFG((TERM) list_PairSecond(list_Car(Scan)));
+    	  flag_GetFlagValue(Flags, flag_PLABELS)) {
+    	printf("\nAdded label %s for declaration \n", Label);
+    	fol_PrettyPrintDFG((TERM) list_PairSecond(list_Car(Scan)));
       }
       Sortlabellist = list_Cons(Label, Sortlabellist);
     }
@@ -1531,45 +1534,45 @@ int main(int argc, const char* argv[])
       /* A pair (<formula,labellist>) */
       /* Get list of clauses derivable from formulae with labels in labellist */
       if (list_Empty(QueryPair)) {
-	break;
+        break;
       }
       for (Scan=list_PairSecond(QueryPair);!list_Empty(Scan);Scan=list_Cdr(Scan)) {
-	LIST l;
-	l = hsh_GetWithCompareFunc(TermLabelToClauselist, list_Car(Scan),
+        LIST l;
+        l = hsh_GetWithCompareFunc(TermLabelToClauselist, list_Car(Scan),
 				   (BOOL (*)(POINTER, POINTER)) cnf_LabelEqual,
 				   (unsigned long (*)(POINTER)) hsh_StringHashKey);
 
-	l = list_PointerDeleteDuplicates(list_Copy(l));
-	LabelClauses = list_Nconc(l, LabelClauses);
+        l = list_PointerDeleteDuplicates(list_Copy(l));
+        LabelClauses = list_Nconc(l, LabelClauses);
       }
       /* Get list of clauses derivable from sorts */
       for (Scan=Sortlabellist; !list_Empty(Scan); Scan=list_Cdr(Scan)) {
-	LIST l;
-	l = hsh_GetWithCompareFunc(TermLabelToClauselist, list_Car(Scan),
+        LIST l;
+        l = hsh_GetWithCompareFunc(TermLabelToClauselist, list_Car(Scan),
 				   (BOOL (*)(POINTER, POINTER)) cnf_LabelEqual,
 				   (unsigned long (*)(POINTER)) hsh_StringHashKey);
 
-	l = list_PointerDeleteDuplicates(list_Copy(l));
-	LabelClauses = list_Nconc(l, LabelClauses);
+        l = list_PointerDeleteDuplicates(list_Copy(l));
+        LabelClauses = list_Nconc(l, LabelClauses);
       }	
 
       /* For labelclauses copies are introduced */
       /* So an update to the clause to term mapping is necessary */
       for (Scan=LabelClauses; !list_Empty(Scan); Scan=list_Cdr(Scan)) {
-	CLAUSE C;
-	LIST l;
-	C = (CLAUSE) list_Car(Scan);
-	l = list_Copy(hsh_Get(ClauseToTermLabellist, C));
-	l = cnf_DeleteDuplicateLabelsFromList(l);
-	list_Rplaca(Scan, clause_Copy(C));
-	hsh_PutList(ClauseToTermLabellist, list_Car(Scan), l);
+        CLAUSE C;
+        LIST l;
+        C = (CLAUSE) list_Car(Scan);
+        l = list_Copy(hsh_Get(ClauseToTermLabellist, C));
+        l = cnf_DeleteDuplicateLabelsFromList(l);
+        list_Rplaca(Scan, clause_Copy(C));
+        hsh_PutList(ClauseToTermLabellist, list_Car(Scan), l);
       }
       QueryClauses   = cnf_QueryFlotter(FlotterSearch, list_PairFirst(QueryPair),
 					&Symblist);
       ProblemClauses = list_Nconc(QueryClauses, LabelClauses);
 
       for (Scan=list_PairSecond(QueryPair); !list_Empty(Scan); Scan= list_Cdr(Scan))
-	string_StringFree(list_Car(Scan)); /* Free the label strings */
+        string_StringFree(list_Car(Scan)); /* Free the label strings */
       list_Delete(list_PairSecond(QueryPair));
       list_PairFree(QueryPair);
       clock_InitCounter(clock_OVERALL);
@@ -1588,13 +1591,13 @@ int main(int argc, const char* argv[])
     Search = top_ProofSearch(Search, ProblemClauses, InputFlags, UserPrecedence, &BoundApplied, NativeClauseInput);
   
     if ((flag_GetFlagValue(Flags, flag_TIMELIMIT) == flag_TIMELIMITUNLIMITED ||
-	 flag_GetFlagValue(Flags, flag_TIMELIMIT) > clock_GetSeconds(clock_OVERALL)) &&
-	prfs_Loops(Search) != 0 &&
-	(BoundApplied == -1 || !list_Empty(prfs_EmptyClauses(Search)))) {
+        flag_GetFlagValue(Flags, flag_TIMELIMIT) > clock_GetSeconds(clock_OVERALL)) &&
+        prfs_Loops(Search) != 0 &&
+        (BoundApplied == -1 || !list_Empty(prfs_EmptyClauses(Search)))) {
       if (list_Empty(prfs_EmptyClauses(Search)))
-	Result = top_COMPLETION;
+        Result = top_COMPLETION;
       else
-	Result = top_PROOF;
+        Result = top_PROOF;
     }
    
     if (flag_GetFlagValue(Flags, flag_TIMELIMIT) != 0) {
@@ -1603,114 +1606,114 @@ int main(int argc, const char* argv[])
       printf("\nSPASS %s ", vrs_VERSION);
       fputs("\nSPASS beiseite: ", stdout);
       switch (Result) {
-      case top_RESOURCE:
-	if (prfs_Loops(Search) != 0)
-	  fputs("Ran out of time.", stdout);
-	else
-	  fputs("Maximal number of loops exceeded.", stdout);
-	break;
-      case top_PROOF:
-	fputs("Proof found.", stdout);
-	break;
-      default:        /* Completion */
-	fputs("Completion found.", stdout);
+        case top_RESOURCE:
+          if (prfs_Loops(Search) != 0)
+            fputs("Ran out of time.", stdout);
+          else
+            fputs("Maximal number of loops exceeded.", stdout);
+          break;
+        case top_PROOF:
+          fputs("Proof found.", stdout);
+          break;
+        default:        /* Completion */
+          fputs("Completion found.", stdout);
       }
       printf("\nProblem: %s ",
 	     (top_InputFile != (char*)NULL ? top_InputFile : "Read from stdin."));
       if (flag_GetFlagValue(Flags, flag_PSTATISTIC)) {
-	clock_StopPassedTime(clock_OVERALL);
-	printf("\nSPASS derived %d clauses,", prfs_DerivedClauses(Search));
-	printf(" backtracked %d clauses", prfs_BacktrackedClauses(Search));
-	printf(" and kept %d clauses.", prfs_KeptClauses(Search));
-	printf("\nSPASS allocated %lu KBytes.", memory_DemandedBytes()/1024);
-	fputs("\nSPASS spent\t", stdout);
-	clock_PrintTime(clock_OVERALL);
-	fputs(" on the problem.\n\t\t", stdout);
-	clock_PrintTime(clock_INPUT);
-	fputs(" for the input.\n\t\t", stdout);
-	clock_PrintTime(clock_CNF);
-	fputs(" for the FLOTTER CNF translation", stdout);
+	    clock_StopPassedTime(clock_OVERALL);
+	    printf("\nSPASS derived %d clauses,", prfs_DerivedClauses(Search));
+	    printf(" backtracked %d clauses", prfs_BacktrackedClauses(Search));
+	    printf(" and kept %d clauses.", prfs_KeptClauses(Search));
+	    printf("\nSPASS allocated %lu KBytes.", memory_DemandedBytes()/1024);
+	    fputs("\nSPASS spent\t", stdout);
+	    clock_PrintTime(clock_OVERALL);
+	    fputs(" on the problem.\n\t\t", stdout);
+	    clock_PrintTime(clock_INPUT);
+	    fputs(" for the input.\n\t\t", stdout);
+	    clock_PrintTime(clock_CNF);
+	    fputs(" for the FLOTTER CNF translation", stdout);
         if(flag_GetFlagValue(Flags, flag_EML)) {
-	  fputs(", of which", stdout);
-	  fputs("\n\t\t", stdout); clock_PrintTime(clock_TRANSL);
-	  fprintf(stdout, " for the translation from %s to FOL", flag_Name(flag_EML));
-	}
-	printf(".");
-	printf("\n\t\t"); clock_PrintTime(clock_INFERENCE);
-	fputs(" for inferences.\n\t\t", stdout);
+          fputs(", of which", stdout);
+	      fputs("\n\t\t", stdout); clock_PrintTime(clock_TRANSL);
+	      fprintf(stdout, " for the translation from %s to FOL", flag_Name(flag_EML));
+	    }
+	    printf(".");
+	    printf("\n\t\t"); clock_PrintTime(clock_INFERENCE);
+	    fputs(" for inferences.\n\t\t", stdout);
         clock_PrintTime(clock_BACKTRACK);
-	fputs(" for the backtracking.\n\t\t", stdout);
-	clock_PrintTime(clock_REDUCTION);
-	puts(" for the reduction.");
+	    fputs(" for the backtracking.\n\t\t", stdout);
+	    clock_PrintTime(clock_REDUCTION);
+	    puts(" for the reduction.");
       }
       if (Result != top_PROOF &&
-	  flag_GetFlagValue(Flags, flag_FPMODEL) != flag_FPMODELOFF) {
-	FILE *Output;
-	char name[100];
-	const char * creator = "{*SPASS " vrs_VERSION " *}";
-	BOOL PrintPotProductive;
+	      flag_GetFlagValue(Flags, flag_FPMODEL) != flag_FPMODELOFF) {
+	    FILE *Output;
+	    char name[100];
+	    const char * creator = "{*SPASS " vrs_VERSION " *}";
+	    BOOL PrintPotProductive;
 
-	strcpy(name, (top_InputFile != (char*)NULL ? top_InputFile : "SPASS"));
-	if (Result == top_COMPLETION)
-	  strcat(name, ".model");
-	else
-	  strcat(name, ".clauses");
-	Output = misc_OpenFile(name,"w");
-	PrintPotProductive = (flag_GetFlagValue(Flags, flag_FPMODEL) ==
+	    strcpy(name, (top_InputFile != (char*)NULL ? top_InputFile : "SPASS"));
+	    if (Result == top_COMPLETION)
+	      strcat(name, ".model");
+	    else
+	      strcat(name, ".clauses");
+	    Output = misc_OpenFile(name,"w");
+	    PrintPotProductive = (flag_GetFlagValue(Flags, flag_FPMODEL) ==
 			      flag_FPMODELPOTENTIALLYPRODUCTIVECLAUSES);
-	if (Result == top_COMPLETION)
-	  clause_FPrintCnfDFGProblem(Output, PrintPotProductive,
+	    if (Result == top_COMPLETION)
+	      clause_FPrintCnfDFGProblem(Output, PrintPotProductive,
 					     "{*Completion_by_SPASS*}",
 					     creator, "satisfiable",
 					     dfg_ProblemDescription(),
 					     prfs_WorkedOffClauses(Search),
 					     list_Nil(), Flags, Precedence, NULL, TRUE, TRUE);
-	else
-	  clause_FPrintCnfDFGProblem(Output, PrintPotProductive,
+	    else
+	      clause_FPrintCnfDFGProblem(Output, PrintPotProductive,
 					     "{*Clauses_generated_by_SPASS*}",
 					     creator, "unknown",
 					     dfg_ProblemDescription(),
 					     prfs_WorkedOffClauses(Search),
 					     prfs_UsableClauses(Search), Flags,
 					     Precedence, NULL, FALSE, TRUE);
-	misc_CloseFile(Output, name);
-	if (Result == top_COMPLETION)
-	  printf("\nCompletion printed to: %s\n", name);
-	else
-	  printf("\nClauses printed to: %s\n", name);
+	    misc_CloseFile(Output, name);
+	    if (Result == top_COMPLETION)
+	      printf("\nCompletion printed to: %s\n", name);
+	    else
+	      printf("\nClauses printed to: %s\n", name);
       }
     
       if (flag_GetFlagValue(Flags, flag_DOCPROOF) && Result != top_RESOURCE) {
-	if (Result == top_COMPLETION) {
-	  puts("\n\n The saturated set of worked-off clauses is :");
-	  clause_ListPrint(prfs_WorkedOffClauses(Search));
-	}
-	else {
-	  LIST UsedClauses, UsedTerms;
-	  if (!top_InputFile)
-	    top_InputFile = "SPASS";
-	  UsedClauses = dp_PrintProof(Search, prfs_EmptyClauses(Search),
-				      top_InputFile);
-	  /* Find terms required for proof */
-	  UsedTerms = list_Nil();
-
-	  for (Scan = UsedClauses; !list_Empty(Scan); Scan = list_Cdr(Scan))
-	    if (clause_IsFromInput((CLAUSE) list_Car(Scan))) {
-	      LIST L;
-	      L = hsh_Get(ClauseToTermLabellist, list_Car(Scan));
-	      L = list_Copy(L);
-	      L = cnf_DeleteDuplicateLabelsFromList(L);
-	      UsedTerms = list_Nconc(UsedTerms, L);
+	    if (Result == top_COMPLETION) {
+	      puts("\n\n The saturated set of worked-off clauses is :");
+	      clause_ListPrint(prfs_WorkedOffClauses(Search));
 	    }
-	  list_Delete(UsedClauses);
-	  UsedTerms = cnf_DeleteDuplicateLabelsFromList(UsedTerms);
-	  fputs("\nFormulae used in the proof :", stdout);
-	  for (Scan = UsedTerms; !list_Empty(Scan); Scan = list_Cdr(Scan)) 
-	    if (!(strncmp((char*) list_Car(Scan), "_SORT_", 6) == 0))
+	    else {
+	      LIST UsedClauses, UsedTerms;
+	      if (!top_InputFile)
+	        top_InputFile = "SPASS";
+	      UsedClauses = dp_PrintProof(Search, prfs_EmptyClauses(Search),
+				      top_InputFile);
+	      /* Find terms required for proof */
+	      UsedTerms = list_Nil();
+
+	      for (Scan = UsedClauses; !list_Empty(Scan); Scan = list_Cdr(Scan))
+	        if (clause_IsFromInput((CLAUSE) list_Car(Scan))) {
+			  LIST L;
+			  L = hsh_Get(ClauseToTermLabellist, list_Car(Scan));
+			  L = list_Copy(L);
+			  L = cnf_DeleteDuplicateLabelsFromList(L);
+			  UsedTerms = list_Nconc(UsedTerms, L);
+	        }
+	      list_Delete(UsedClauses);
+	      UsedTerms = cnf_DeleteDuplicateLabelsFromList(UsedTerms);
+	      fputs("\nFormulae used in the proof :", stdout);
+	      for (Scan = UsedTerms; !list_Empty(Scan); Scan = list_Cdr(Scan))
+	        if (!(strncmp((char*) list_Car(Scan), "_SORT_", 6) == 0))
 	      printf(" %s", (char*) list_Car(Scan));
-	  putchar('\n');
-	  list_Delete(UsedTerms);
-	}
+	      putchar('\n');
+	      list_Delete(UsedTerms);
+	    }
       }
     }
     
