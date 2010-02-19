@@ -1,0 +1,7 @@
+Note for programming SLR in Eclipse IDE
+
+=== Task List: 
+	Tag:	TTQ_COMMENT:	importal comment code
+		TTQ_BOOKMARK:	importal bookmark
+
+
