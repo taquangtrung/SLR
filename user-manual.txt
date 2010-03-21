@@ -1,7 +1,7 @@
 Note for programming SLR in Eclipse IDE
 
 === Task List: 
-	Tag:	TTQ_COMMENT:	importal comment code
-		TTQ_BOOKMARK:	importal bookmark
+	Tag:	TTQ_NOTE:	show importal note in Task View
+		TTQ_BOOKMARK:	show importal bookmark in Task View
 
 
