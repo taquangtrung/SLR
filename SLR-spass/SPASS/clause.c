@@ -2517,159 +2517,352 @@ void clause_Init(void)
 		clause_SORT[i] = list_Nil();
 }
 
-CLAUSE clause_CreateBody(int ClauseLength)
-/**************************************************************
- INPUT:   The number of literals as integer.
- RETURNS: A new generated clause node for 'ClauseLength'
- MEMORY:  Allocates a CLAUSE_NODE and the needed array for LITERALs.
- *************************************************************/
-{
-	CLAUSE Result;
+#ifdef _TRUNGTQ_CODE_
 
-	Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
+	CLAUSE clause_CreateBody(int ClauseLength, int JustifiedLength)
+	/**************************************************************
+	 * JUSTIFIED
+	 *
+	 INPUT:   The number of literals as integer.
+	 RETURNS: A new generated clause node for 'ClauseLength'
+	 MEMORY:  Allocates a CLAUSE_NODE and the needed array for LITERALs.
+	 *************************************************************/
+	{
+		CLAUSE Result;
 
-	Result->clausenumber = clause_IncreaseCounter();
-	Result->maxVar = symbol_GetInitialStandardVarCounter();
-	Result->flags = 0;
-	Result->depth = 0;
-	clause_InitSplitData(Result);
-	Result->weight = clause_WEIGHTUNDEFINED;
-	Result->parentCls = list_Nil();
-	Result->parentLits = list_Nil();
+		Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
 
-	Result->c = 0;
-	Result->a = 0;
-	Result->s = 0;
+		Result->clausenumber = clause_IncreaseCounter();
+		Result->maxVar = symbol_GetInitialStandardVarCounter();
+		Result->flags = 0;
+		Result->depth = 0;
+		clause_InitSplitData(Result);
+		Result->weight = clause_WEIGHTUNDEFINED;
+		Result->parentCls = list_Nil();
+		Result->parentLits = list_Nil();
 
-	if (ClauseLength != 0)
-		Result->literals = (LITERAL *) memory_Malloc((ClauseLength)
-				* sizeof(LITERAL));
+		Result->c = 0;
+		Result->a = 0;
+		Result->s = 0;
+		Result->j = 0;
 
-	clause_SetFromInput(Result);
+		if (ClauseLength != 0)
+			Result->literals = (LITERAL *) memory_Malloc((ClauseLength)
+					* sizeof(LITERAL));
 
-	return Result;
-}
+		if (JustifiedLength != 0)
+			Result->justifiedLiterals = (LITERAL *) memory_Malloc((JustifiedLength)
+					* sizeof(LITERAL));
 
-CLAUSE clause_Create(LIST Constraint, LIST Antecedent, LIST Succedent,
-		FLAGSTORE Flags, PRECEDENCE Precedence)
-/**************************************************************
- INPUT:   Three lists of pointers to atoms, a flag store and
- a precedence.
- RETURNS: The new generated clause.
- MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
- uses the terms from the lists, additionally allocates
- termnodes for the fol_Not() in Const. and Ante.
- *************************************************************/
-{
-	CLAUSE Result;
-	int i, c, a, s;
+		clause_SetFromInput(Result);
 
-	Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
-
-	Result->clausenumber = clause_IncreaseCounter();
-	Result->flags = 0;
-	Result->depth = 0;
-	Result->weight = clause_WEIGHTUNDEFINED;
-	clause_InitSplitData(Result);
-	Result->parentCls = list_Nil();
-	Result->parentLits = list_Nil();
-
-	Result->c = (c = list_Length(Constraint));
-	Result->a = (a = list_Length(Antecedent));
-	Result->s = (s = list_Length(Succedent));
-
-	if (!clause_IsEmptyClause(Result))
-		Result->literals = (LITERAL *) memory_Malloc((c + a + s)
-				* sizeof(LITERAL));
-
-	for (i = 0; i < c; i++) {
-		Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
-				list_List((TERM) list_Car(Constraint))), Result);
-		Constraint = list_Cdr(Constraint);
+		return Result;
 	}
 
-	a += c;
-	for (; i < a; i++) {
-		Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
-				list_List((TERM) list_Car(Antecedent))), Result);
-		Antecedent = list_Cdr(Antecedent);
+#else
+
+	CLAUSE clause_CreateBody(int ClauseLength)
+	/**************************************************************
+	 INPUT:   The number of literals as integer.
+	 RETURNS: A new generated clause node for 'ClauseLength'
+	 MEMORY:  Allocates a CLAUSE_NODE and the needed array for LITERALs.
+	 *************************************************************/
+	{
+		CLAUSE Result;
+
+		Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
+
+		Result->clausenumber = clause_IncreaseCounter();
+		Result->maxVar = symbol_GetInitialStandardVarCounter();
+		Result->flags = 0;
+		Result->depth = 0;
+		clause_InitSplitData(Result);
+		Result->weight = clause_WEIGHTUNDEFINED;
+		Result->parentCls = list_Nil();
+		Result->parentLits = list_Nil();
+
+		Result->c = 0;
+		Result->a = 0;
+		Result->s = 0;
+
+		if (ClauseLength != 0)
+			Result->literals = (LITERAL *) memory_Malloc((ClauseLength)
+					* sizeof(LITERAL));
+
+		clause_SetFromInput(Result);
+
+		return Result;
 	}
 
-	s += a;
-	for (; i < s; i++) {
-		Result->literals[i] = clause_LiteralCreate((TERM) list_Car(Succedent),
-				Result);
-		Succedent = list_Cdr(Succedent);
+#endif
+
+
+
+
+#ifdef _TRUNGTQ_CODE_
+
+	CLAUSE clause_Create(LIST Constraint, LIST Antecedent, LIST Succedent, LIST Justified,
+			FLAGSTORE Flags, PRECEDENCE Precedence)
+	/**************************************************************
+	 INPUT:   Three lists of pointers to atoms, a flag store and
+	 a precedence.
+	 RETURNS: The new generated clause.
+	 MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
+	 uses the terms from the lists, additionally allocates
+	 termnodes for the fol_Not() in Const. and Ante.
+	 *************************************************************/
+	{
+		CLAUSE Result;
+		int i, c, a, s, j;
+		Result->depth = 0;
+		Result->weight = clause_WEIGHTUNDEFINED;
+		clause_InitSplitData(Result);
+		Result->parentCls = list_Nil();
+		Result->parentLits = list_Nil();
+
+		Result->c = (c = list_Length(Constraint));
+		Result->a = (a = list_Length(Antecedent));
+		Result->s = (s = list_Length(Succedent));
+		Result->j = (s = list_Length(Justified));
+
+		if (!clause_IsEmptyClause(Result)) {
+			Result->literals = (LITERAL *) memory_Malloc((c + a + s) * sizeof(LITERAL));
+			Result->justifiedLiterals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
+		}
+
+		for (i = 0; i < c; i++) {
+			Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
+					list_List((TERM) list_Car(Constraint))), Result);
+			Constraint = list_Cdr(Constraint);
+		}
+
+		a += c;
+		for (; i < a; i++) {
+			Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
+					list_List((TERM) list_Car(Antecedent))), Result);
+			Antecedent = list_Cdr(Antecedent);
+		}
+
+		s += a;
+		for (; i < s; i++) {
+			Result->literals[i] = clause_LiteralCreate((TERM) list_Car(Succedent),
+					Result);
+			Succedent = list_Cdr(Succedent);
+		}
+
+		// them justified
+		for (int d = 0; d < j; d++) {
+			Result->justifiedLiterals[d] = clause_LiteralCreate((TERM) list_Car(Justified), Result);
+			Justified = list_Cdr(Justified);
+		}
+
+		clause_OrientAndReInit(Result, Flags, Precedence);
+		clause_SetFromInput(Result);
+
+		return Result;
 	}
 
-	clause_OrientAndReInit(Result, Flags, Precedence);
-	clause_SetFromInput(Result);
+#else
 
-	return Result;
-}
+	CLAUSE clause_Create(LIST Constraint, LIST Antecedent, LIST Succedent,
+			FLAGSTORE Flags, PRECEDENCE Precedence)
+	/**************************************************************
+	 INPUT:   Three lists of pointers to atoms, a flag store and
+	 a precedence.
+	 RETURNS: The new generated clause.
+	 MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
+	 uses the terms from the lists, additionally allocates
+	 termnodes for the fol_Not() in Const. and Ante.
+	 *************************************************************/
+	{
+		CLAUSE Result;
+		int i, c, a, s;
 
-CLAUSE clause_CreateCrude(LIST Constraint, LIST Antecedent, LIST Succedent,
-		BOOL Con)
-/**************************************************************
- INPUT:   Three lists of pointers to literals (!) and a Flag indicating
- whether the clause comes from the conjecture part of of problem.
- It is assumed that Constraint and Antecedent literals are negative,
- whereas Succedent literals are positive.
- RETURNS: The new generated clause, where a clause_OrientAndReInit has still
- to be performed, i.e., variables are not normalized, maximal literal
- flags not set, equations not oriented, the weight is not set.
- MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
- uses the terms from the lists, additionally allocates
- termnodes for the fol_Not() in Const. and Ante.
- ****************************************************************/
-{
-	CLAUSE Result;
-	int i, c, a, s;
+		Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
 
-	Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
+		Result->clausenumber = clause_IncreaseCounter();
+		Result->flags = 0;
+		Result->depth = 0;
+		Result->weight = clause_WEIGHTUNDEFINED;
+		clause_InitSplitData(Result);
+		Result->parentCls = list_Nil();
+		Result->parentLits = list_Nil();
 
-	Result->clausenumber = clause_IncreaseCounter();
-	Result->flags = 0;
-	if (Con)
-		clause_SetFlag(Result, CONCLAUSE);
+		Result->c = (c = list_Length(Constraint));
+		Result->a = (a = list_Length(Antecedent));
+		Result->s = (s = list_Length(Succedent));
 
-	Result->depth = 0;
-	Result->weight = clause_WEIGHTUNDEFINED;
-	clause_InitSplitData(Result);
-	Result->parentCls = list_Nil();
-	Result->parentLits = list_Nil();
+		if (!clause_IsEmptyClause(Result))
+			Result->literals = (LITERAL *) memory_Malloc((c + a + s)
+					* sizeof(LITERAL));
 
-	Result->c = (c = list_Length(Constraint));
-	Result->a = (a = list_Length(Antecedent));
-	Result->s = (s = list_Length(Succedent));
+		for (i = 0; i < c; i++) {
+			Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
+					list_List((TERM) list_Car(Constraint))), Result);
+			Constraint = list_Cdr(Constraint);
+		}
 
-	if (!clause_IsEmptyClause(Result))
-		Result->literals = (LITERAL *) memory_Malloc((c + a + s)
-				* sizeof(LITERAL));
+		a += c;
+		for (; i < a; i++) {
+			Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
+					list_List((TERM) list_Car(Antecedent))), Result);
+			Antecedent = list_Cdr(Antecedent);
+		}
 
-	for (i = 0; i < c; i++) {
-		Result->literals[i]
-				= clause_LiteralCreate(list_Car(Constraint), Result);
-		Constraint = list_Cdr(Constraint);
+		s += a;
+		for (; i < s; i++) {
+			Result->literals[i] = clause_LiteralCreate((TERM) list_Car(Succedent),
+					Result);
+			Succedent = list_Cdr(Succedent);
+		}
+
+		clause_OrientAndReInit(Result, Flags, Precedence);
+		clause_SetFromInput(Result);
+
+		return Result;
 	}
 
-	a += c;
-	for (; i < a; i++) {
-		Result->literals[i]
-				= clause_LiteralCreate(list_Car(Antecedent), Result);
-		Antecedent = list_Cdr(Antecedent);
+#endif
+
+
+#ifdef _TRUNGTQ_CODE_
+	CLAUSE clause_CreateCrude(LIST Constraint, LIST Antecedent, LIST Succedent, LIST Justified,
+			BOOL Con)
+	/**************************************************************
+	 INPUT:   Three lists of pointers to literals (!) and a Flag indicating
+	 whether the clause comes from the conjecture part of of problem.
+	 It is assumed that Constraint and Antecedent literals are negative,
+	 whereas Succedent literals are positive.
+	 RETURNS: The new generated clause, where a clause_OrientAndReInit has still
+	 to be performed, i.e., variables are not normalized, maximal literal
+	 flags not set, equations not oriented, the weight is not set.
+	 MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
+	 uses the terms from the lists, additionally allocates
+	 termnodes for the fol_Not() in Const. and Ante.
+	 ****************************************************************/
+	{
+		CLAUSE Result;
+		int i, c, a, s, j;
+
+		Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
+
+		Result->clausenumber = clause_IncreaseCounter();
+		Result->flags = 0;
+		if (Con)
+			clause_SetFlag(Result, CONCLAUSE);
+
+		Result->depth = 0;
+		Result->weight = clause_WEIGHTUNDEFINED;
+		clause_InitSplitData(Result);
+		Result->parentCls = list_Nil();
+		Result->parentLits = list_Nil();
+
+		Result->c = (c = list_Length(Constraint));
+		Result->a = (a = list_Length(Antecedent));
+		Result->s = (s = list_Length(Succedent));
+		Result->j = (s = list_Length(Justified));
+
+		if (!clause_IsEmptyClause(Result)) {
+			Result->literals = (LITERAL *) memory_Malloc((c + a + s) * sizeof(LITERAL));
+			Result->justifiedLiterals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
+		}
+
+		for (i = 0; i < c; i++) {
+			Result->literals[i]
+					= clause_LiteralCreate(list_Car(Constraint), Result);
+			Constraint = list_Cdr(Constraint);
+		}
+
+		a += c;
+		for (; i < a; i++) {
+			Result->literals[i]
+					= clause_LiteralCreate(list_Car(Antecedent), Result);
+			Antecedent = list_Cdr(Antecedent);
+		}
+
+		s += a;
+		for (; i < s; i++) {
+			Result->literals[i] = clause_LiteralCreate(list_Car(Succedent), Result);
+			Succedent = list_Cdr(Succedent);
+		}
+
+		for (int d = 0; d < j; d++) {
+			Result->literals[d]
+					= clause_LiteralCreate(list_Car(Justified), Result);
+			Justified = list_Cdr(Justified);
+		}
+
+		clause_SetFromInput(Result);
+
+		return Result;
 	}
 
-	s += a;
-	for (; i < s; i++) {
-		Result->literals[i] = clause_LiteralCreate(list_Car(Succedent), Result);
-		Succedent = list_Cdr(Succedent);
+#else
+
+	CLAUSE clause_CreateCrude(LIST Constraint, LIST Antecedent, LIST Succedent,
+			BOOL Con)
+	/**************************************************************
+	 INPUT:   Three lists of pointers to literals (!) and a Flag indicating
+	 whether the clause comes from the conjecture part of of problem.
+	 It is assumed that Constraint and Antecedent literals are negative,
+	 whereas Succedent literals are positive.
+	 RETURNS: The new generated clause, where a clause_OrientAndReInit has still
+	 to be performed, i.e., variables are not normalized, maximal literal
+	 flags not set, equations not oriented, the weight is not set.
+	 MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
+	 uses the terms from the lists, additionally allocates
+	 termnodes for the fol_Not() in Const. and Ante.
+	 ****************************************************************/
+	{
+		CLAUSE Result;
+		int i, c, a, s;
+
+		Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
+
+		Result->clausenumber = clause_IncreaseCounter();
+		Result->flags = 0;
+		if (Con)
+			clause_SetFlag(Result, CONCLAUSE);
+
+		Result->depth = 0;
+		Result->weight = clause_WEIGHTUNDEFINED;
+		clause_InitSplitData(Result);
+		Result->parentCls = list_Nil();
+		Result->parentLits = list_Nil();
+
+		Result->c = (c = list_Length(Constraint));
+		Result->a = (a = list_Length(Antecedent));
+		Result->s = (s = list_Length(Succedent));
+
+		if (!clause_IsEmptyClause(Result))
+			Result->literals = (LITERAL *) memory_Malloc((c + a + s)
+					* sizeof(LITERAL));
+
+		for (i = 0; i < c; i++) {
+			Result->literals[i]
+					= clause_LiteralCreate(list_Car(Constraint), Result);
+			Constraint = list_Cdr(Constraint);
+		}
+
+		a += c;
+		for (; i < a; i++) {
+			Result->literals[i]
+					= clause_LiteralCreate(list_Car(Antecedent), Result);
+			Antecedent = list_Cdr(Antecedent);
+		}
+
+		s += a;
+		for (; i < s; i++) {
+			Result->literals[i] = clause_LiteralCreate(list_Car(Succedent), Result);
+			Succedent = list_Cdr(Succedent);
+		}
+
+		clause_SetFromInput(Result);
+
+		return Result;
 	}
 
-	clause_SetFromInput(Result);
-
-	return Result;
-}
+#endif
 
 CLAUSE clause_CreateUnnormalized(LIST Constraint, LIST Antecedent,
 		LIST Succedent)

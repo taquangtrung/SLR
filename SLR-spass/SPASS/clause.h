@@ -209,9 +209,22 @@ typedef enum {
 
 void clause_Init(void);
 
-CLAUSE clause_CreateBody(int);
-CLAUSE clause_Create(LIST, LIST, LIST, FLAGSTORE, PRECEDENCE);
-CLAUSE clause_CreateCrude(LIST, LIST, LIST, BOOL);
+#ifdef _TRUNGTQ_CODE_
+
+	CLAUSE clause_CreateBody(int, int);
+	CLAUSE clause_Create(LIST, LIST, LIST, LIST, FLAGSTORE, PRECEDENCE);
+	CLAUSE clause_CreateCrude(LIST, LIST, LIST, LIST, BOOL);
+
+#else
+
+	CLAUSE clause_CreateBody(int);
+	CLAUSE clause_Create(LIST, LIST, LIST, FLAGSTORE, PRECEDENCE);
+	CLAUSE clause_CreateCrude(LIST, LIST, LIST, BOOL);
+
+#endif
+
+
+
 CLAUSE clause_CreateUnnormalized(LIST, LIST, LIST);
 CLAUSE clause_CreateFromLiterals(LIST, BOOL, BOOL, BOOL, FLAGSTORE, PRECEDENCE);
 CLAUSE clause_CreateFromLiteralLists(LIST, LIST, LIST, BOOL, TERM);
