@@ -1,0 +1,27 @@
+begin_problem(Pelletier56).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 56*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  functions[(f,1)].
+  predicates[(F,1)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(equiv(forall([U],implies(exists([V],and(F(V),equal(U,f(V)))),F(U))),forall([W],implies(F(W),F(f(W)))))).
+
+end_of_list.
+
+end_problem.
+

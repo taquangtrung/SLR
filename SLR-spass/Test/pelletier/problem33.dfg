@@ -1,0 +1,27 @@
+begin_problem(Pelletier33).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 33*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  functions[(a,0), (b,0), (c,0)].
+  predicates[(P,1)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(equiv(forall([U],implies(and(P(a),implies(P(U),P(b))),P(c))),forall([V],and(or(not(P(a)),or(P(V),P(c))),or(not(P(a)),or(not(P(b)),P(c))))))).
+
+end_of_list.
+
+end_problem.
+

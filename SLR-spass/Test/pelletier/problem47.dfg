@@ -1,0 +1,41 @@
+begin_problem(Pelletier47).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 47*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  predicates[(P1,1), (P0,1), (P2,1), (P3,1), (P4,1), (P5,1), (Q1,1), (Q0,1), (R,2), (S,2)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+formula(forall([U],implies(P1(U),P0(U)))).
+formula(exists([U],P1(U))).
+formula(and(forall([U],implies(P2(U),P0(U))),exists([V],P2(V)))).
+formula(and(forall([U],implies(P3(U),P0(U))),exists([V],P3(V)))).
+formula(and(forall([U],implies(P4(U),P0(U))),exists([V],P4(V)))).
+formula(and(forall([U],implies(P5(U),P0(U))),exists([V],P5(V)))).
+formula(and(exists([U],Q1(U)),forall([V],implies(Q1(V),Q0(V))))).
+formula(forall([U],implies(P0(U),or(forall([V],implies(Q0(V),R(U,V))),forall([W],implies(and(P0(W),S(W,U),exists([X],and(Q0(X),R(W,X)))),R(U,W))))))).
+formula(forall([U,V],implies(and(P3(V),or(P5(U),P4(U))),S(U,V)))).
+formula(forall([U],forall([V],implies(and(P3(U),P2(V)),S(U,V))))).
+formula(forall([U],forall([V],implies(and(P2(U),P1(V)),S(U,V))))).
+formula(forall([U,V],implies(and(P1(U),or(P2(V),Q1(V))),not(R(U,V))))).
+formula(forall([U,V],implies(and(P3(U),P4(V)),R(U,V)))).
+formula(forall([U,V],implies(and(P3(U),P5(V)),not(R(U,V))))).
+formula(forall([U],implies(or(P4(U),P5(U)),exists([V],and(Q0(V),R(U,V)))))).
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(exists([U,V],and(P0(U),P0(V),exists([W],and(Q1(W),R(V,W),R(U,V)))))).
+
+end_of_list.
+
+end_problem.
+

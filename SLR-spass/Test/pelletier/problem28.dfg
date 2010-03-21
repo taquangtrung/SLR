@@ -1,0 +1,29 @@
+begin_problem(Pelletier28).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 28*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  predicates[(P,1), (Q,1), (R,1), (S,1), (F,1), (G,1)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+formula(forall([U],implies(P(U),forall([V],Q(V))))).
+formula(implies(forall([U],or(Q(U),R(U))),exists([V],and(Q(V),S(V))))).
+formula(implies(exists([U],S(U)),forall([V],implies(F(V),G(V))))).
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(forall([U],implies(and(P(U),F(U)),G(U)))).
+
+end_of_list.
+
+end_problem.
+

@@ -1,0 +1,27 @@
+begin_problem(Pelletier62).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 62*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  functions[(a,0), (f,1)].
+  predicates[(F,1)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(implies(forall([U],implies(and(F(a),implies(F(U),F(f(U)))),F(f(f(U))))),forall([V],and(or(not(F(a)),F(V),F(f(f(V)))),or(not(F(a)),not(F(f(V))),F(f(f(V)))))))).
+
+end_of_list.
+
+end_problem.
+

@@ -1,0 +1,27 @@
+begin_problem(Pelletier52).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 52*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  predicates[(F,2)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+formula(exists([U,V],forall([W,X],equiv(F(W,X),and(equal(W,U),equal(X,V)))))).
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(exists([U],forall([V],equiv(exists([W],forall([X],equiv(F(X,V),equal(X,W)))),equal(V,U))))).
+
+end_of_list.
+
+end_problem.
+

@@ -1,0 +1,27 @@
+begin_problem(Pelletier43).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 43*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  predicates[(Q,2), (F,2)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+formula(forall([U],forall([V],equiv(Q(U,V),forall([W],equiv(F(W,U),F(W,V))))))).
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(forall([U],forall([V],equiv(Q(U,V),Q(V,U))))).
+
+end_of_list.
+
+end_problem.
+

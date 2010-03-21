@@ -1,0 +1,31 @@
+begin_problem(Pelletier67).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 67*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  functions[(i,2), (n,1)].
+  predicates[(T,1)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+formula(forall([U],forall([V],T(i(U,i(V,U)))))).
+formula(forall([U],forall([V],forall([W],T(i(i(U,i(V,W)),i(i(U,V),i(U,W)))))))).
+formula(forall([U],forall([V],T(i(i(n(U),n(V)),i(V,U)))))).
+formula(forall([U],forall([V],and(T(i(U,V)),implies(T(U),T(V)))))).
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(forall([U],T(i(n(n(U)),U)))).
+
+end_of_list.
+
+end_problem.
+

@@ -1,0 +1,26 @@
+begin_problem(Pelletier16).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 16*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  predicates[(P,0), (Q,0)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(or(implies(P,Q),implies(Q,P))).
+
+end_of_list.
+
+end_problem.
+

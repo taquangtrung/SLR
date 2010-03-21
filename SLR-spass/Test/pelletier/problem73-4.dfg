@@ -1,0 +1,26 @@
+begin_problem(Pelletier73_4).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 73-4*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  predicates[(O,1), (H,1), (I,2)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(not(and(exists([U],exists([V],exists([W],exists([X],and(O(U),O(V),O(W),O(X),not(equal(U,V)),not(equal(U,W)),not(equal(U,X)),not(equal(V,W)),not(equal(V,X)),not(equal(W,X))))))),exists([Y],exists([Z],exists([X1],and(H(Y),H(Z),H(X1),not(equal(Y,Z)),not(equal(Y,X1)),not(equal(Z,X1)),forall([X2],implies(H(X2),or(equal(X2,Y),equal(X2,Z),equal(X2,X1)))))))),forall([X3],implies(O(X3),exists([X4],and(H(X4),I(X3,X4))))),forall([X5],implies(H(X5),forall([X6],forall([X7],implies(and(O(X6),O(X7),I(X6,X5),I(X7,X5)),equal(X6,X7))))))))).
+
+end_of_list.
+
+end_problem.
+

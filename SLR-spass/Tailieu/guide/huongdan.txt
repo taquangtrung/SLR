@@ -1,0 +1,3 @@
+Huong dan build:
+
+- Neu bi loi c99: thi them tham so sau vao setting cua phan C/C++ Build: -std=c99

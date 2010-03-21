@@ -1,0 +1,27 @@
+begin_problem(Pelletier58).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 58*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  functions[(f,1), (g,1)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+formula(forall([U],forall([V],equal(f(U),f(V))))).
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(forall([U,V],equal(f(f(U)),f(g(V))))).
+
+end_of_list.
+
+end_problem.
+

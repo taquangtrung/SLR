@@ -1,0 +1,26 @@
+begin_problem(Pelletier20).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 20*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  predicates[(P,1), (Q,1), (R,1), (S,1)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(implies(forall([U],forall([V],exists([W],forall([X],implies(and(P(U),Q(V)),and(R(W),S(X))))))),implies(exists([Y],exists([Z],and(P(Y),Q(Z)))),exists([X1],R(X1))))).
+
+end_of_list.
+
+end_problem.
+

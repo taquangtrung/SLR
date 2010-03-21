@@ -1,0 +1,27 @@
+begin_problem(Pelletier38).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 38*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  functions[(a,0)].
+  predicates[(P,1), (R,2)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(equiv(forall([U],implies(and(P(a),implies(P(U),exists([V],and(P(V),R(U,V))))),exists([W],exists([X],and(P(W),R(U,X),R(X,W)))))),forall([Y],and(or(or(not(P(a)),P(Y)),exists([Z],exists([X1],and(P(Z),R(Y,X1),R(X1,Z))))),or(or(not(P(a)),not(exists([X2],and(P(X2),R(Y,X2))))),exists([X3],exists([X4],and(P(X3),R(Y,X4),R(X4,X3))))))))).
+
+end_of_list.
+
+end_problem.
+

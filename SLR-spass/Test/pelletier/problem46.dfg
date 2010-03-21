@@ -1,0 +1,29 @@
+begin_problem(Pelletier46).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 46*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  predicates[(F,1), (H,2), (G,1), (J,2)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+formula(forall([U],implies(and(F(U),forall([V],implies(and(F(V),H(V,U)),G(V)))),G(U)))).
+formula(implies(exists([U],and(F(U),not(G(U)))),exists([V],and(F(V),not(G(V)),forall([W],implies(and(F(W),not(G(W))),J(V,W))))))).
+formula(forall([U],forall([V],implies(and(F(U),F(V),H(U,V)),not(J(V,U)))))).
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(forall([U],implies(F(U),G(U)))).
+
+end_of_list.
+
+end_problem.
+

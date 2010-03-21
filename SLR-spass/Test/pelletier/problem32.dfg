@@ -1,0 +1,29 @@
+begin_problem(Pelletier32).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 32*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  predicates[(F,1), (G,1), (H,1), (I,1), (J,1), (K,1)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+formula(forall([U],implies(and(F(U),or(G(U),H(U))),I(U)))).
+formula(forall([U],implies(and(I(U),H(U)),J(U)))).
+formula(forall([U],implies(K(U),H(U)))).
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(forall([U],implies(and(F(U),K(U)),J(U)))).
+
+end_of_list.
+
+end_problem.
+

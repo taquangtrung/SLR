@@ -1,0 +1,37 @@
+begin_problem(Pelletier55).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 55*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  functions[(a,0), (b,0), (c,0)].
+  predicates[(L,1), (K,2), (H,2), (R,2)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+formula(exists([U],and(L(U),K(U,a)))).
+formula(and(L(a),L(b),L(c))).
+formula(forall([U],or(implies(L(U),equal(U,a)),equal(U,b),equal(U,c)))).
+formula(forall([U],forall([V],implies(K(V,U),H(V,U))))).
+formula(forall([U],forall([V],implies(K(U,V),not(R(U,V)))))).
+formula(forall([U],implies(H(a,U),not(H(c,U))))).
+formula(forall([U],implies(not(equal(U,b)),H(a,U)))).
+formula(forall([U],implies(not(R(U,a)),H(b,U)))).
+formula(forall([U],implies(H(a,U),H(b,U)))).
+formula(forall([U],exists([V],not(H(U,V))))).
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(or(equal(a,b),K(a,a))).
+
+end_of_list.
+
+end_problem.
+

@@ -1,0 +1,26 @@
+begin_problem(Pelletier34).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 34*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  predicates[(P,1), (Q,1)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(equiv(equiv(exists([U],forall([V],equiv(P(U),P(V)))),equiv(exists([W],Q(W)),forall([X],Q(X)))),equiv(exists([Y],forall([Z],equiv(Q(Y),Q(Z)))),equiv(exists([X1],P(X1)),forall([X2],P(X2)))))).
+
+end_of_list.
+
+end_problem.
+

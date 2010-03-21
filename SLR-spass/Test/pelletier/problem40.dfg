@@ -1,0 +1,26 @@
+begin_problem(Pelletier40).
+
+list_of_descriptions.
+name({*Pelletier's Problem No. 40*}).
+author({*Christoph Weidenbach*}).
+status(unsatisfiable).
+description({*Problem taken in revised form from the "Pelletier Collection", Journal of Automated
+	Reasoning, Vol. 2, No. 2, pages 191-216*}).
+end_of_list.
+
+list_of_symbols.
+  predicates[(F,2)].
+end_of_list.
+
+list_of_formulae(axioms).
+
+end_of_list.
+
+list_of_formulae(conjectures).
+
+formula(implies(exists([U],forall([V],equiv(F(V,U),F(V,V)))),not(forall([W],exists([X],forall([Y],equiv(F(Y,X),not(F(Y,W))))))))).
+
+end_of_list.
+
+end_problem.
+
