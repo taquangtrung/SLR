@@ -1756,7 +1756,16 @@ static CLAUSE red_CRwLitTautologyCheck(PROOFSEARCH Search, CLAUSE RedClause,
 
 		/* Apply Sort Simplification for constraint literals only */
 		NegLits = list_List(term_Copy(Atom));
+
+#ifdef _TRUNGTQ_CODE_
+
+		aux = clause_Create(NegLits, list_Nil(), list_Nil(), list_Nil(), Flags, Precedence);
+
+#else
+
 		aux = clause_Create(NegLits, list_Nil(), list_Nil(), Flags, Precedence);
+
+#endif
 		clause_SetTemporary(aux);
 		list_Delete(NegLits);
 
@@ -1804,7 +1813,17 @@ static CLAUSE red_CRwLitTautologyCheck(PROOFSEARCH Search, CLAUSE RedClause,
 	}
 
 	/* Create clause for tautology test */
+
+#ifdef _TRUNGTQ_CODE_
+
+	aux = clause_Create(list_Nil(), NegLits, PosLits, list_Nil(), Flags, Precedence);
+
+#else
+
 	aux = clause_Create(list_Nil(), NegLits, PosLits, Flags, Precedence);
+
+#endif
+
 	clause_SetTemporary(aux);
 	list_Delete(NegLits);
 	list_Delete(PosLits);
@@ -4256,8 +4275,17 @@ BOOL red_ClauseDeletion(SORTTHEORY Theory, CLAUSE RedClause, FLAGSTORE Flags,
 					RedClause, i))), Scan);
 
 		Scan = list_NReverse(Scan);
-		ConstraintClause = clause_Create(Scan, list_Nil(), list_Nil(), Flags,
-				Precedence);
+
+#ifdef _TRUNGTQ_CODE_
+
+		ConstraintClause = clause_Create(Scan, list_Nil(), list_Nil(), list_Nil(), Flags, Precedence);
+
+#else
+
+		ConstraintClause = clause_Create(Scan, list_Nil(), list_Nil(), Flags, Precedence);
+
+#endif
+
 		list_Delete(Scan);
 		clause_InitSplitData(ConstraintClause);
 		clause_AddParentClause(ConstraintClause, clause_Number(RedClause));

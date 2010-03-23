@@ -225,9 +225,28 @@ void clause_Init(void);
 
 
 
-CLAUSE clause_CreateUnnormalized(LIST, LIST, LIST);
+#ifdef _TRUNGTQ_CODE_
+
+	CLAUSE clause_CreateUnnormalized(LIST, LIST, LIST, LIST);
+
+#else
+
+	CLAUSE clause_CreateUnnormalized(LIST, LIST, LIST);
+
+#endif
+
 CLAUSE clause_CreateFromLiterals(LIST, BOOL, BOOL, BOOL, FLAGSTORE, PRECEDENCE);
-CLAUSE clause_CreateFromLiteralLists(LIST, LIST, LIST, BOOL, TERM);
+
+#ifdef _TRUNGTQ_CODE_
+
+	CLAUSE clause_CreateFromLiteralLists(LIST, LIST, LIST, LIST, BOOL, TERM);
+
+#else
+
+	CLAUSE clause_CreateFromLiteralLists(LIST, LIST, LIST, BOOL, TERM);
+
+#endif
+
 void clause_Delete(CLAUSE);
 
 LITERAL clause_LiteralCreate(TERM, CLAUSE);

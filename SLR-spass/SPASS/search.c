@@ -969,8 +969,18 @@ CLAUSE prfs_DoSplitting(PROOFSEARCH PS, CLAUSE SplitClause, LIST Literals)
 	lengthNew = list_Length(Literals);
 	lengthBlocked = clause_Length(SplitClause) - lengthNew;
 
+#ifdef _TRUNGTQ_CODE_
+
+	NewClause = clause_CreateBody(lengthNew, 0); /* The left  clause */
+	BlockedClause = clause_CreateBody(lengthBlocked, 0); /* The right clause */
+
+#else
+
 	NewClause = clause_CreateBody(lengthNew); /* The left  clause */
 	BlockedClause = clause_CreateBody(lengthBlocked); /* The right clause */
+
+#endif
+
 	clause_DecreaseCounter(); /* reset internally increased counter! */
 	clause_SetNumber(BlockedClause, 0);
 	/* To detect forgotten setting at insertion! */
@@ -1063,12 +1073,22 @@ CLAUSE prfs_DoSplitting(PROOFSEARCH PS, CLAUSE SplitClause, LIST Literals)
 			NextLit = clause_GetLiteral(NewClause, i);
 			AtomList = list_List(term_Copy(clause_LiteralAtom(NextLit)));
 
+#ifdef _TRUNGTQ_CODE_
+
 			if (i <= la)
-				UnitClause = clause_Create(list_Nil(), list_Nil(), AtomList,
-						prfs_Store(PS), prfs_Precedence(PS));
+				UnitClause = clause_Create(list_Nil(), list_Nil(), AtomList, list_Nil(), prfs_Store(PS), prfs_Precedence(PS));
 			else
-				UnitClause = clause_Create(list_Nil(), AtomList, list_Nil(),
-						prfs_Store(PS), prfs_Precedence(PS));
+				UnitClause = clause_Create(list_Nil(), AtomList, list_Nil(), list_Nil(), prfs_Store(PS), prfs_Precedence(PS));
+
+#else
+
+			if (i <= la)
+				UnitClause = clause_Create(list_Nil(), list_Nil(), AtomList, prfs_Store(PS), prfs_Precedence(PS));
+			else
+				UnitClause = clause_Create(list_Nil(), AtomList, list_Nil(), prfs_Store(PS), prfs_Precedence(PS));
+
+#endif
+
 
 			clause_SetNumber(UnitClause, -1);
 			/* To detect forgotten setting at reinsertion! */

@@ -70,6 +70,14 @@ static __inline__ void clause_FreeLitArray(CLAUSE Clause) {
 	NAT Length = clause_Length(Clause);
 	if (Length > 0)
 		memory_Free(Clause->literals, sizeof(LITERAL) * Length);
+
+#ifdef _TRUNGTQ_CODE_
+
+	Length = clause_NumOfJustifiedLits(Clause);
+	if (Length > 0)
+		memory_Free(Clause->justifiedLiterals, sizeof(LITERAL) * Length);
+
+#endif
 }
 
 /**************************************************************/
@@ -394,7 +402,6 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 	 RETURNS: The list of copied JUSTIFIED literals o dang TERM (ko co dau) from <Clause>.
 	 ***************************************************************/
 	{
-		// TODO - dang code
 //		return clause_CopyLitInterval(Clause,
 //				clause_FirstJustifiedLitIndex(Clause),
 //				clause_LastJustifiedLitIndex(Clause));
@@ -1460,6 +1467,8 @@ void clause_SubstApply(SUBST Subst, CLAUSE Clause)
  EFFECTS: Applies the substitution to the clause.
  ***********************************************************/
 {
+	// TODO . co the phai sua
+
 	int i, n;
 
 #ifdef CHECK
@@ -2864,110 +2873,238 @@ void clause_Init(void)
 
 #endif
 
-CLAUSE clause_CreateUnnormalized(LIST Constraint, LIST Antecedent,
-		LIST Succedent)
-/**************************************************************
- INPUT:   Three lists of pointers to atoms.
- RETURNS: The new generated clause.
- MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
- uses the terms from the lists, additionally allocates
- termnodes for the fol_Not() in Const. and Ante.
- CAUTION: The weight of the clause is not set correctly and
- equations are not oriented!
- ****************************************************************/
-{
-	CLAUSE Result;
-	int i, c, a, s;
+#ifdef _TRUNGTQ_CODE_
 
-	Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
+	CLAUSE clause_CreateUnnormalized(LIST Constraint, LIST Antecedent,
+			LIST Succedent, LIST Justified)
+	/**************************************************************
+	 INPUT:   Three lists of pointers to atoms.
+	 RETURNS: The new generated clause.
+	 MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
+	 uses the terms from the lists, additionally allocates
+	 termnodes for the fol_Not() in Const. and Ante.
+	 CAUTION: The weight of the clause is not set correctly and
+	 equations are not oriented!
+	 ****************************************************************/
+	{
+		CLAUSE Result;
+		int i, c, a, s, j;
 
-	Result->clausenumber = clause_IncreaseCounter();
-	Result->flags = 0;
-	Result->depth = 0;
-	Result->weight = clause_WEIGHTUNDEFINED;
-	clause_InitSplitData(Result);
-	Result->parentCls = list_Nil();
-	Result->parentLits = list_Nil();
+		Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
 
-	Result->c = (c = list_Length(Constraint));
-	Result->a = (a = list_Length(Antecedent));
-	Result->s = (s = list_Length(Succedent));
+		Result->clausenumber = clause_IncreaseCounter();
+		Result->flags = 0;
+		Result->depth = 0;
+		Result->weight = clause_WEIGHTUNDEFINED;
+		clause_InitSplitData(Result);
+		Result->parentCls = list_Nil();
+		Result->parentLits = list_Nil();
 
-	if (!clause_IsEmptyClause(Result)) {
-		Result->literals = (LITERAL *) memory_Malloc((c + a + s)
-				* sizeof(LITERAL));
+		Result->c = (c = list_Length(Constraint));
+		Result->a = (a = list_Length(Antecedent));
+		Result->s = (s = list_Length(Succedent));
+		Result->j = (j = list_Length(Justified));
 
-		for (i = 0; i < c; i++) {
-			Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
-					list_List(list_Car(Constraint))), Result);
-			Constraint = list_Cdr(Constraint);
+		if (!clause_IsEmptyClause(Result)) {
+			Result->literals = (LITERAL *) memory_Malloc((c + a + s)
+					* sizeof(LITERAL));
+
+			for (i = 0; i < c; i++) {
+				Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
+						list_List(list_Car(Constraint))), Result);
+				Constraint = list_Cdr(Constraint);
+			}
+
+			a += c;
+			for (; i < a; i++) {
+				Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
+						list_List(list_Car(Antecedent))), Result);
+				Antecedent = list_Cdr(Antecedent);
+			}
+
+			s += a;
+			for (; i < s; i++) {
+				Result->literals[i] = clause_LiteralCreate((TERM) list_Car(
+						Succedent), Result);
+				Succedent = list_Cdr(Succedent);
+			}
+
+			for (int d = 0; d < j; d++) {
+				Result->justifiedLiterals[d] = clause_LiteralCreate((TERM) list_Car(Justified), Result);
+				Justified = list_Cdr(Justified);
+			}
+
+			clause_UpdateMaxVar(Result);
 		}
 
-		a += c;
-		for (; i < a; i++) {
-			Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
-					list_List(list_Car(Antecedent))), Result);
-			Antecedent = list_Cdr(Antecedent);
-		}
-
-		s += a;
-		for (; i < s; i++) {
-			Result->literals[i] = clause_LiteralCreate((TERM) list_Car(
-					Succedent), Result);
-			Succedent = list_Cdr(Succedent);
-		}
-		clause_UpdateMaxVar(Result);
+		return Result;
 	}
 
-	return Result;
-}
+#else
 
-CLAUSE clause_CreateFromLiteralLists(LIST Constraint, LIST Antecedent,
-		LIST Succedent, BOOL Conclause, TERM selected)
-/**************************************************************
- INPUT:   Three lists of literals, a boolean flag indicating
- whether the clause is a conjecture clause, and a
- selected term.
- RETURNS: The new generated clause.
- EFFECT:  The result clause will be normalized and the maximal
- variable will be set. If the flag is set, the clause
- will be set as a conjecture clause. If the selected
- term is not NULL, its corresponding literal will be
- selected.
- This function is intended for the parser for creating
- clauses at a time when the ordering and weight flags
- aren't determined finally.
- MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
- uses the terms from the lists.
- ****************************************************************/
-{
-	CLAUSE Result;
+	CLAUSE clause_CreateUnnormalized(LIST Constraint, LIST Antecedent,
+			LIST Succedent)
+	/**************************************************************
+	 INPUT:   Three lists of pointers to atoms.
+	 RETURNS: The new generated clause.
+	 MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
+	 uses the terms from the lists, additionally allocates
+	 termnodes for the fol_Not() in Const. and Ante.
+	 CAUTION: The weight of the clause is not set correctly and
+	 equations are not oriented!
+	 ****************************************************************/
+	{
+		CLAUSE Result;
+		int i, c, a, s;
 
-	Result = clause_CreateUnnormalized(Constraint, Antecedent, Succedent);
+		Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
 
-	if (Conclause)
-		clause_SetFlag(Result, CONCLAUSE);
+		Result->clausenumber = clause_IncreaseCounter();
+		Result->flags = 0;
+		Result->depth = 0;
+		Result->weight = clause_WEIGHTUNDEFINED;
+		clause_InitSplitData(Result);
+		Result->parentCls = list_Nil();
+		Result->parentLits = list_Nil();
 
-	if (selected != (TERM) NULL) {
-		int i;
-		for (i = clause_FirstAntecedentLitIndex(Result); i
-				<= clause_LastAntecedentLitIndex(Result); ++i) {
-			TERM negated;
-			negated = clause_GetLiteralAtom(Result, i);
-			if (negated == selected) {
-				clause_LiteralSetFlag(clause_GetLiteral(Result, i), LITSELECT);
-				clause_SetFlag(Result, CLAUSESELECT);
-				break;
+		Result->c = (c = list_Length(Constraint));
+		Result->a = (a = list_Length(Antecedent));
+		Result->s = (s = list_Length(Succedent));
+
+		if (!clause_IsEmptyClause(Result)) {
+			Result->literals = (LITERAL *) memory_Malloc((c + a + s)
+					* sizeof(LITERAL));
+
+			for (i = 0; i < c; i++) {
+				Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
+						list_List(list_Car(Constraint))), Result);
+				Constraint = list_Cdr(Constraint);
+			}
+
+			a += c;
+			for (; i < a; i++) {
+				Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
+						list_List(list_Car(Antecedent))), Result);
+				Antecedent = list_Cdr(Antecedent);
+			}
+
+			s += a;
+			for (; i < s; i++) {
+				Result->literals[i] = clause_LiteralCreate((TERM) list_Car(
+						Succedent), Result);
+				Succedent = list_Cdr(Succedent);
+			}
+			clause_UpdateMaxVar(Result);
+		}
+
+		return Result;
+	}
+
+#endif
+
+
+
+#ifdef _TRUNGTQ_CODE_
+
+	CLAUSE clause_CreateFromLiteralLists(LIST Constraint, LIST Antecedent,
+			LIST Succedent, LIST Justified, BOOL Conclause, TERM selected)
+	/**************************************************************
+	 INPUT:   Three lists of literals, a boolean flag indicating
+	 whether the clause is a conjecture clause, and a
+	 selected term.
+	 RETURNS: The new generated clause.
+	 EFFECT:  The result clause will be normalized and the maximal
+	 variable will be set. If the flag is set, the clause
+	 will be set as a conjecture clause. If the selected
+	 term is not NULL, its corresponding literal will be
+	 selected.
+	 This function is intended for the parser for creating
+	 clauses at a time when the ordering and weight flags
+	 aren't determined finally.
+	 MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
+	 uses the terms from the lists.
+	 ****************************************************************/
+	{
+		CLAUSE Result;
+
+		Result = clause_CreateUnnormalized(Constraint, Antecedent, Succedent, Justified);
+
+		if (Conclause)
+			clause_SetFlag(Result, CONCLAUSE);
+
+		if (selected != (TERM) NULL) {
+			int i;
+			for (i = clause_FirstAntecedentLitIndex(Result); i
+					<= clause_LastAntecedentLitIndex(Result); ++i) {
+				TERM negated;
+				negated = clause_GetLiteralAtom(Result, i);
+				if (negated == selected) {
+					clause_LiteralSetFlag(clause_GetLiteral(Result, i), LITSELECT);
+					clause_SetFlag(Result, CLAUSESELECT);
+					break;
+				}
 			}
 		}
+
+		clause_Normalize(Result);
+		clause_UpdateMaxVar(Result);
+		clause_SetFromInput(Result);
+
+		return Result;
 	}
 
-	clause_Normalize(Result);
-	clause_UpdateMaxVar(Result);
-	clause_SetFromInput(Result);
+#else
 
-	return Result;
-}
+	CLAUSE clause_CreateFromLiteralLists(LIST Constraint, LIST Antecedent,
+			LIST Succedent, BOOL Conclause, TERM selected)
+	/**************************************************************
+	 INPUT:   Three lists of literals, a boolean flag indicating
+	 whether the clause is a conjecture clause, and a
+	 selected term.
+	 RETURNS: The new generated clause.
+	 EFFECT:  The result clause will be normalized and the maximal
+	 variable will be set. If the flag is set, the clause
+	 will be set as a conjecture clause. If the selected
+	 term is not NULL, its corresponding literal will be
+	 selected.
+	 This function is intended for the parser for creating
+	 clauses at a time when the ordering and weight flags
+	 aren't determined finally.
+	 MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
+	 uses the terms from the lists.
+	 ****************************************************************/
+	{
+		CLAUSE Result;
+
+		Result = clause_CreateUnnormalized(Constraint, Antecedent, Succedent);
+
+		if (Conclause)
+			clause_SetFlag(Result, CONCLAUSE);
+
+		if (selected != (TERM) NULL) {
+			int i;
+			for (i = clause_FirstAntecedentLitIndex(Result); i
+					<= clause_LastAntecedentLitIndex(Result); ++i) {
+				TERM negated;
+				negated = clause_GetLiteralAtom(Result, i);
+				if (negated == selected) {
+					clause_LiteralSetFlag(clause_GetLiteral(Result, i), LITSELECT);
+					clause_SetFlag(Result, CLAUSESELECT);
+					break;
+				}
+			}
+		}
+
+		clause_Normalize(Result);
+		clause_UpdateMaxVar(Result);
+		clause_SetFromInput(Result);
+
+		return Result;
+	}
+
+#endif
+
+
 
 CLAUSE clause_CreateFromLiterals(LIST LitList, BOOL Sorts, BOOL Conclause,
 		BOOL Ordering, FLAGSTORE Flags, PRECEDENCE Precedence)
@@ -3013,7 +3150,17 @@ CLAUSE clause_CreateFromLiterals(LIST LitList, BOOL Sorts, BOOL Conclause,
 	Constraint = list_NReverse(Constraint);
 	Antecedent = list_NReverse(Antecedent);
 	Succedent = list_NReverse(Succedent);
+
+#ifdef _TRUNGTQ_CODE_
+
+	Result = clause_CreateCrude(Constraint, Antecedent, Succedent, list_Nil(), Conclause);
+
+#else
+
 	Result = clause_CreateCrude(Constraint, Antecedent, Succedent, Conclause);
+
+#endif
+
 
 	list_Delete(Constraint);
 	list_Delete(Antecedent);
@@ -3107,6 +3254,15 @@ void clause_Delete(CLAUSE Clause)
 
 	for (i = 0; i < n; i++)
 		clause_LiteralDelete(clause_GetLiteral(Clause, i));
+
+#ifdef _TRUNGTQ_CODE_
+	// delete justified literals
+	int m = clause_NumOfJustifiedLits(Clause);
+
+	for (int d = 0; d < m; d++)
+		clause_LiteralDelete(clause_GetJustifiedLiteral(Clause, d));
+
+#endif
 
 	clause_FreeLitArray(Clause);
 
