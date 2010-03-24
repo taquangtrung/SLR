@@ -53,6 +53,7 @@
 #include "foldfg.h"
 #include "strings.h"
 #include "eml.h"
+#include "../usercode/user-defined.h"
 
 	/* Used for the texts from description section. */
 	typedef struct {
@@ -1495,17 +1496,17 @@ LIST dfg_DFGParser(FILE* File, FLAGSTORE Flags, PRECEDENCE Precedence, LIST* Axi
 	for (scan = dfg_PLAINAXCLAUSES; !list_Empty(scan); scan = list_Cdr(scan)) {
 		DFG_PLAINCLAUSE clause = list_Car(scan);
 
-#ifdef _TRUNGTQ_CODE_
+//#ifdef _TRUNGTQ_CODE_
 
 		CLAUSE newclause = clause_CreateFromLiteralLists(clause->constraint, clause->antecedent,
-							clause->succedent, list_Nil(), FALSE, clause->selected);
+							clause->succedent, clause->justified, FALSE, clause->selected);
 
-#else
-
-		CLAUSE newclause = clause_CreateFromLiteralLists(clause->constraint, clause->antecedent,
-					clause->succedent, FALSE, clause->selected);
-
-#endif
+//#else
+//
+//		CLAUSE newclause = clause_CreateFromLiteralLists(clause->constraint, clause->antecedent,
+//					clause->succedent, FALSE, clause->selected);
+//
+//#endif
 
 		dfg_AXCLAUSES = list_Nconc(dfg_AXCLAUSES, list_List(newclause));
 	}
@@ -1514,18 +1515,18 @@ LIST dfg_DFGParser(FILE* File, FLAGSTORE Flags, PRECEDENCE Precedence, LIST* Axi
 	for (scan = dfg_PLAINCONCLAUSES; !list_Empty(scan); scan = list_Cdr(scan)) {
 		DFG_PLAINCLAUSE clause = list_Car(scan);
 
-#ifdef _TRUNGTQ_CODE_
-
-		CLAUSE newclause = clause_CreateFromLiteralLists(clause->constraint, clause->antecedent,
-					clause->succedent, list_Nil(), TRUE, clause->selected);
-
-
-#else
+//#ifdef _TRUNGTQ_CODE_
+//
+//		CLAUSE newclause = clause_CreateFromLiteralLists(clause->constraint, clause->antecedent,
+//					clause->succedent, list_Nil(), TRUE, clause->selected);
+//
+//
+//#else
 
 		CLAUSE newclause = clause_CreateFromLiteralLists(clause->constraint, clause->antecedent,
 					clause->succedent, TRUE, clause->selected);
 
-#endif
+//#endif
 
 		dfg_CONCLAUSES = list_Nconc(dfg_CONCLAUSES, list_List(newclause));
 	}

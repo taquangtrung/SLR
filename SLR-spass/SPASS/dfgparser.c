@@ -245,6 +245,7 @@
 #include "foldfg.h"
 #include "strings.h"
 #include "eml.h"
+#include "../usercode/user-defined.h"
 
 /* Used for the texts from description section. */
 typedef struct {
@@ -262,6 +263,13 @@ typedef struct {
   LIST constraint;
   LIST antecedent;
   LIST succedent;
+
+#ifdef _TRUNGTQ_CODE_
+
+  LIST justified;
+
+#endif
+
   TERM selected;
 } DFG_PLAINCLAUSEHELP, *DFG_PLAINCLAUSE;
 

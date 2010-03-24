@@ -160,7 +160,7 @@ typedef enum {
 		int c; /* number of constraint literals */
 		int a; /* number of antecedent literals */
 		int s; /* number of succedent literals */
-		RULE origin;
+		RULE origin;		// clause co duoc la do su dung luat nao (Resolution, Factoring, Ordering...)
 	}*CLAUSE, CLAUSE_NODE;
 
 #else
@@ -237,15 +237,15 @@ void clause_Init(void);
 
 CLAUSE clause_CreateFromLiterals(LIST, BOOL, BOOL, BOOL, FLAGSTORE, PRECEDENCE);
 
-#ifdef _TRUNGTQ_CODE_
-
-	CLAUSE clause_CreateFromLiteralLists(LIST, LIST, LIST, LIST, BOOL, TERM);
-
-#else
+//#ifdef _TRUNGTQ_CODE_
+//
+//	CLAUSE clause_CreateFromLiteralLists(LIST, LIST, LIST, LIST, BOOL, TERM);
+//
+//#else
 
 	CLAUSE clause_CreateFromLiteralLists(LIST, LIST, LIST, BOOL, TERM);
 
-#endif
+//#endif
 
 void clause_Delete(CLAUSE);
 
@@ -721,7 +721,7 @@ static __inline__ LIST clause_GetLiteralListExcept(CLAUSE Clause, int Index)
 		C->justifiedLiterals[Index] = L;
 	}
 
-	static __inline__ TERM clause_GetJustifidedLiteralTerm(CLAUSE C, int Index) {
+	static __inline__ TERM clause_GetJustifiedLiteralTerm(CLAUSE C, int Index) {
 		return clause_LiteralSignedAtom(clause_GetJustifiedLiteral(C, Index));
 	}
 
@@ -741,8 +741,16 @@ static __inline__ LIST clause_GetLiteralListExcept(CLAUSE Clause, int Index)
 		return 0;
 	}
 
+	static __inline__ LITERAL clause_FirstJustifiedLit(CLAUSE Clause) {
+		return Clause->justifiedLiterals[clause_FirstJustifiedLitIndex(Clause)];
+	}
+
 	static __inline__ int clause_LastJustifiedLitIndex(CLAUSE Clause) {
 		return clause_NumOfJustifiedLits(Clause) - 1;
+	}
+
+	static __inline__ LITERAL clause_LastJustifiedLit(CLAUSE Clause) {
+		return Clause->justifiedLiterals[clause_LastJustifiedLitIndex(Clause)];
 	}
 
 	static __inline__ LIST clause_GetJustifiedLiteralList(CLAUSE Clause)
@@ -761,23 +769,23 @@ static __inline__ LIST clause_GetLiteralListExcept(CLAUSE Clause, int Index)
 		return Result;
 	}
 
-//	static __inline__ LIST clause_GetLiteralListExcept(CLAUSE Clause, int Index)
-//	/**************************************************************
-//	 INPUT:   A clause.
-//	 RETURNS: A new list is created containing all JUSTIFIED literals of the
-//	 clause except the JUSTIFIED literal at <Index>. The list contains
-//	 pointers, not literal indexes.
-//	 ***************************************************************/
-//	{
-//		LIST Result;
-//		int i;
-//
-//		Result = list_Nil();
-//		for (i = clause_FirstJustifiedLitIndex(); i <= clause_LastJustifiedLitIndex(Clause); i++)
-//			if (i != Index)
-//				Result = list_Cons(clause_GetJustifiedLiteral(Clause, i), Result);
-//		return Result;
-//	}
+	static __inline__ LIST clause_GetJustifiedLiteralListExcept(CLAUSE Clause, int Index)
+	/**************************************************************
+	 INPUT:   A clause.
+	 RETURNS: A new list is created containing all JUSTIFIED literals of the
+	 clause except the JUSTIFIED literal at <Index>. The list contains
+	 pointers, not literal indexes.
+	 ***************************************************************/
+	{
+		LIST Result;
+		int i;
+
+		Result = list_Nil();
+		for (i = clause_FirstJustifiedLitIndex(Clause); i <= clause_LastJustifiedLitIndex(Clause); i++)
+			if (i != Index)
+				Result = list_Cons(clause_GetJustifiedLiteral(Clause, i), Result);
+		return Result;
+	}
 
 #endif
 
