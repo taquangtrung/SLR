@@ -47,6 +47,7 @@
 
 
 #include "term.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Global variables                                           */

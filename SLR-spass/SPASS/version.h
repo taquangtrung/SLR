@@ -53,6 +53,7 @@
 #include <unistd.h>
 
 #include "version.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Globals                                                    */

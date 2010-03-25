@@ -34,6 +34,7 @@
 #include "term.h"
 #include "list.h"
 #include "hasharray.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Global Variables and Constants (Only seen by macros)       */

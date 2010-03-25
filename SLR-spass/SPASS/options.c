@@ -101,6 +101,7 @@
 
 #include "options.h"
 #include "strings.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Local variables  and types                                 */

@@ -46,7 +46,7 @@
 /* $RCSfile: rpos.c,v $ */
 
 #include "rpos.h"
-
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Top Down Version                                           */

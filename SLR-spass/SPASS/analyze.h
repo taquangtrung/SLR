@@ -53,6 +53,7 @@
 #include "sort.h"
 #include "list.h"
 #include "graph.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Global Variables                                           */

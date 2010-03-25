@@ -57,7 +57,7 @@
 
 #include "term.h"
 #include "partition.h"
-
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Basic types                                                */

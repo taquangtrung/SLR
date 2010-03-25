@@ -51,6 +51,7 @@
 #include "term.h"
 #include "order.h"
 #include "context.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /*  Function Prototypes                                       */

@@ -54,6 +54,7 @@
 
 #include "term.h"
 #include "st.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Data Structures and Constants                              */

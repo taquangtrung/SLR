@@ -52,6 +52,7 @@
 #include "clause.h"
 #include "sharing.h"
 #include "flags.h"
+#include "../usercode/user-defined.h"
 
 CLAUSE red_Terminator(CLAUSE,NAT,SHARED_INDEX,SHARED_INDEX,FLAGSTORE,PRECEDENCE);
 

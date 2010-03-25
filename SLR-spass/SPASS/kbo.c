@@ -47,6 +47,7 @@
 
 #include "kbo.h"
 #include "order.h"
+#include "../usercode/user-defined.h"
 
 const int kbo_MINWEIGHT = 1;
 

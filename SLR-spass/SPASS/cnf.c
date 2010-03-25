@@ -47,6 +47,7 @@
 #include "cnf.h"
 #include "rules-inf.h"
 #include "rules-red.h"
+#include "../usercode/user-defined.h"
 
 static TERM cnf_AntiPrenexPath(TERM, TERM);
 static TERM cnf_ApplyDefinitionInternOnce(TERM, TERM, TERM, TERM, BOOL*);

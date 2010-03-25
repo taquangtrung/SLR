@@ -45,6 +45,7 @@
 /* $RCSfile: sort.c,v $ */
 
 #include "sort.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Global Variables                                           */

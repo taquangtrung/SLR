@@ -57,6 +57,7 @@
 #include "doc-proof.h"
 #include "clock.h"
 #include "closure.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Constants                                                  */

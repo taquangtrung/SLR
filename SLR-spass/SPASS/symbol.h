@@ -55,6 +55,7 @@
 
 #include "list.h"
 #include "strings.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Data Structures and Constants                              */

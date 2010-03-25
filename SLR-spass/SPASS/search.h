@@ -49,6 +49,7 @@
 
 #include "clause.h"
 #include "sort.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Data Structures and Constants                              */

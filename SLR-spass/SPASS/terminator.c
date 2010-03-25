@@ -49,6 +49,7 @@
 
 #include "terminator.h"
 #include "list.h"
+#include "../usercode/user-defined.h"
 
 static LIST red_GetTerminatorPartnerLits(TERM Atom, LITERAL Lit, BOOL UnitsOnly, LIST IndexList)
 /**************************************************************

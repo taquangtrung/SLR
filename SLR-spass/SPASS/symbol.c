@@ -46,6 +46,7 @@
 /* $RCSfile: symbol.c,v $ */
 
 #include "symbol.h"
+#include "../usercode/user-defined.h"
 
 SIGNATURE *symbol_SIGNATURE;
 

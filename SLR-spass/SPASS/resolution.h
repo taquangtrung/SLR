@@ -57,7 +57,7 @@
 #include "st.h"
 #include "subsumption.h"
 #include "condensing.h"
-
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Functions                                                  */

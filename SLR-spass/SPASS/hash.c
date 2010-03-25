@@ -46,6 +46,7 @@
 /* $RCSfile: hash.c,v $ */
 
 #include "hash.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Global Variables                                           */

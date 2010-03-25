@@ -46,7 +46,7 @@
 /* $RCSfile: st.c,v $ */
 
 #include "st.h"
-
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Local Variables                                            */

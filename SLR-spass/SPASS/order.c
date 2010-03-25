@@ -50,6 +50,7 @@
 #include "kbo.h"
 #include "rpos.h"
 #include "symbol.h"
+#include "../usercode/user-defined.h"
 
 NAT        ord_VARCOUNT[symbol__MAXSTANDARDVAR][2];
 PRECEDENCE ord_PRECEDENCE;

@@ -45,6 +45,7 @@
 /* $RCSfile: vector.c,v $ */
 
 #include "vector.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Global Variables                                           */

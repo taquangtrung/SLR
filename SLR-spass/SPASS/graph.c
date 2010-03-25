@@ -45,6 +45,7 @@
 /* $RCSfile: graph.c,v $ */
 
 #include "graph.h"
+#include "../usercode/user-defined.h"
 
 
 static LIST graph_ROOTS;      /* used as stack by SCC algorithm */

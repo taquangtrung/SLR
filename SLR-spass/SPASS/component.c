@@ -47,6 +47,7 @@
 
 #include "term.h"
 #include "component.h"
+#include "../usercode/user-defined.h"
 
 
 CLITERAL literal_Create(BOOL used, int literal_index, LIST varlist) 

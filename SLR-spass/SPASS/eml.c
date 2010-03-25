@@ -28,6 +28,7 @@
 #include "eml.h"
 #include "foldfg.h"
 #include "flags.h"
+#include "../usercode/user-defined.h"
 
 SYMBOL  eml_APPLYF;
 SYMBOL  eml_BOX;

@@ -51,6 +51,7 @@
 #include <stdio.h>
 #include "list.h"
 #include "flags.h"
+#include "../usercode/user-defined.h"
 
 /* Parser functions */
 LIST ia_GetNextRequest(FILE*,FLAGSTORE);  /* Returns a pair! */

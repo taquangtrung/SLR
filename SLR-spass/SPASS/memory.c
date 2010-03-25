@@ -45,6 +45,7 @@
 /* $RCSfile: memory.c,v $ */
 
 #include "memory.h"
+#include "../usercode/user-defined.h"
 
 unsigned int memory_PAGESIZE; /* size of a page                            */
 long memory_MAXMEM; /* amount of memory available for allocation */
@@ -597,6 +598,17 @@ POINTER memory_Malloc(unsigned int Bytes)
  call exit().
  *********************************************************/
 {
+
+#ifdef _TRUNGTQ_CODE_
+	// neu cap phat 0 byte bo nho thi tra ve con tro NULL
+	if (Bytes == 0)
+		return NULL;
+
+#endif
+
+
+
+
 	char *NewMemory; /* pointer to allocated memory */
 
 	MEMORY_RESOURCE *Resource; /* current page resource,

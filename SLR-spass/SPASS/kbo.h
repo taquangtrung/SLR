@@ -55,6 +55,7 @@
 #include "context.h"
 #include "foldfg.h"
 #include "order.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /*  FUNCTIONS                                                 */

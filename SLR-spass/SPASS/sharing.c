@@ -46,6 +46,7 @@
 /* $RCSfile: sharing.c,v $ */
 
 #include "sharing.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Static Variables                                           */

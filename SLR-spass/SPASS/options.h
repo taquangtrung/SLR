@@ -54,6 +54,7 @@
 
 #include "flags.h"
 #include "list.h"
+#include "../usercode/user-defined.h"
 
 
 /**************************************************************/

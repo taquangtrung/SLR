@@ -46,6 +46,7 @@
 /* $RCSfile: hasharray.c,v $ */
 
 #include "hasharray.h"
+#include "../usercode/user-defined.h"
 
 
 /**************************************************************/

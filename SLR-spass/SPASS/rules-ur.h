@@ -49,6 +49,7 @@
 #include "clause.h"
 #include "sharing.h"
 #include "flags.h"
+#include "../usercode/user-defined.h"
 
 LIST inf_URResolution(CLAUSE, SHARED_INDEX, FLAGSTORE, PRECEDENCE);
 

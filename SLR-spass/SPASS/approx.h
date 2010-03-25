@@ -49,6 +49,7 @@
 
 #include "list.h"
 #include "clause.h"
+#include "../usercode/user-defined.h"
 
 void approx_Init(void);
 

@@ -53,6 +53,7 @@
 
 #include "memory.h"
 #include "misc.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Data Structures and Constants                              */

@@ -53,7 +53,7 @@
 
 #include <math.h>
 #include "memory.h"
-
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Functions                                                  */

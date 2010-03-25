@@ -60,6 +60,7 @@
 #include "tableau.h"
 #include "search.h"
 #include "dfg.h"
+#include "../usercode/user-defined.h"
 
 
 LIST  pcheck_ReduceSPASSProof(LIST);

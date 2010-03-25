@@ -46,6 +46,7 @@
 /* $RCSfile: renaming.c,v $ */
 
 #include "renaming.h"
+#include "../usercode/user-defined.h"
 
 static NAT ren_STAMPID;
 

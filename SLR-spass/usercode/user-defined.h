@@ -8,7 +8,7 @@
 #ifndef USERDEFINED_H_
 #define USERDEFINED_H_
 
-//#define _TRUNGTQ_CODE_			// co the la _TrungTQ_Code hoac _SPASS_Code
+#define _TRUNGTQ_CODE_			// co the la _TrungTQ_Code hoac _SPASS_Code
 
 enum CodeUser {
 	TrungTQ,

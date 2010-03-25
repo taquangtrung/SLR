@@ -58,6 +58,7 @@
 #include "search.h"
 #include "doc-proof.h"
 #include "proofcheck.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Data Structures and Constants                              */

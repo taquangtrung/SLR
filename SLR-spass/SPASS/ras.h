@@ -51,6 +51,7 @@
 
 #include "misc.h"
 #include "memory.h"
+#include "../usercode/user-defined.h"
 
 
 /**************************************************************/

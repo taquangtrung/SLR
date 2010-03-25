@@ -50,7 +50,7 @@
 #define _VECTOR_
 
 #include "misc.h"
-
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Type and Variable Definitions                              */

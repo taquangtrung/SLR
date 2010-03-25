@@ -52,6 +52,7 @@
 #include "list.h"
 #include "flags.h"
 #include "clause.h"
+#include "../usercode/user-defined.h"
 
 typedef enum { DFG_SATISFIABLE, DFG_UNSATISFIABLE, DFG_UNKNOWNSTATE } DFG_STATE;
 

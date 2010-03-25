@@ -56,6 +56,7 @@
 #include "unify.h"
 #include "context.h"
 #include "term.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Global Variables and Constants (Only seen by macros)       */

@@ -57,6 +57,7 @@
 #include "resolution.h"
 #include "search.h"
 #include "flags.h"
+#include "../usercode/user-defined.h"
 
 #include <string.h>
 

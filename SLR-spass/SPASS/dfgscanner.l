@@ -55,6 +55,7 @@
 #include "term.h"
 #include "dfg.h"
 #include "dfgparser.h"
+#include "../usercode/user-defined.h"
 
 /* defined in dfgparser.y */
 extern NAT  dfg_LINENUMBER;

@@ -46,6 +46,7 @@
 /* $RCSfile: clock.c,v $ */
 
 #include "clock.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Global Variables                                           */

@@ -2623,6 +2623,9 @@ void clause_Init(void)
 	{
 		CLAUSE Result;
 		int i, c, a, s, j;
+
+		Result = (CLAUSE) memory_Malloc(sizeof(CLAUSE_NODE));
+		Result->clausenumber = clause_IncreaseCounter();
 		Result->depth = 0;
 		Result->weight = clause_WEIGHTUNDEFINED;
 		clause_InitSplitData(Result);
@@ -2632,7 +2635,7 @@ void clause_Init(void)
 		Result->c = (c = list_Length(Constraint));
 		Result->a = (a = list_Length(Antecedent));
 		Result->s = (s = list_Length(Succedent));
-		Result->j = (s = list_Length(Justified));
+		Result->j = (j = list_Length(Justified));
 
 		if (!clause_IsEmptyClause(Result)) {
 			Result->literals = (LITERAL *) memory_Malloc((c + a + s) * sizeof(LITERAL));
@@ -2769,7 +2772,7 @@ void clause_Init(void)
 		Result->c = (c = list_Length(Constraint));
 		Result->a = (a = list_Length(Antecedent));
 		Result->s = (s = list_Length(Succedent));
-		Result->j = (s = list_Length(Justified));
+		Result->j = (j = list_Length(Justified));
 
 		if (!clause_IsEmptyClause(Result)) {
 			Result->literals = (LITERAL *) memory_Malloc((c + a + s) * sizeof(LITERAL));

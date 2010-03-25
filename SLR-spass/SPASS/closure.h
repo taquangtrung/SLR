@@ -52,7 +52,7 @@
 #include "clause.h"
 #include "table.h"
 #include "ras.h"
-
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Prototype                                                  */

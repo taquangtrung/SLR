@@ -51,6 +51,7 @@
 
 #include "list.h"
 #include "clause.h"
+#include "../usercode/user-defined.h"
 
 typedef struct TABLEAU_HELP {
   LIST   Clauses;               /* all clauses generated on the split level */

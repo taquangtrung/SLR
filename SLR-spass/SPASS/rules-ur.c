@@ -49,6 +49,7 @@
 
 #include "rules-ur.h"
 #include "list.h"
+#include "../usercode/user-defined.h"
 
 static LIST inf_GetURPartnerLits(TERM Atom, LITERAL Lit, BOOL Unit, SHARED_INDEX Index)
 /**************************************************************

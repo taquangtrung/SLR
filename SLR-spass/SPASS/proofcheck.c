@@ -42,6 +42,7 @@
 /* $RCSfile: proofcheck.c,v $ */
 
 #include "proofcheck.h"
+#include "../usercode/user-defined.h"
 
 
 /* options */
@@ -1158,8 +1159,8 @@ static void pcheck_SplitToProblems(TABLEAU T, const char* ProofFileName,
 
   Negations = tab_RightSplitClauses(T);
   if (!list_Empty(Negations) && pcheck_IsRightSplitHalf(list_Car(Negations))) {
-    /* EK: Meiner Meinung nach ist es eine Invariante, daß die erste */
-    /* Elternklausel die rechte Hälfte eines Splittings ist???  */
+    /* EK: Meiner Meinung nach ist es eine Invariante, daï¿½ die erste */
+    /* Elternklausel die rechte Hï¿½lfte eines Splittings ist???  */
     Negations = list_Cdr(Negations);
     /* build C <=> C' v C''  */
     RightClauseTerm = pcheck_ClauseToTerm(list_Car(tab_RightSplitClauses(T)));

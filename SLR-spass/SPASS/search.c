@@ -46,6 +46,7 @@
 
 #include "search.h"
 #include "defs.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Functions                                                  */

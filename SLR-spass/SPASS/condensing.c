@@ -47,6 +47,7 @@
 #include "subsumption.h"
 #include "misc.h"
 #include "condensing.h"
+#include "../usercode/user-defined.h"
 
 
 LIST cond_CondFast(CLAUSE c)

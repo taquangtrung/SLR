@@ -50,6 +50,7 @@
 #include "misc.h"
 #include <sys/types.h>
 #include <sys/time.h>
+#include "../usercode/user-defined.h"
 
 typedef enum {
   clock_BACKTRACK,

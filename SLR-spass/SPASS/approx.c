@@ -47,6 +47,7 @@
 #include <math.h>
 #include "approx.h"
 #include "clause.h"
+#include "../usercode/user-defined.h"
 
 static char approx_BUFFER[symbol__SYMBOLMAXLEN];/* Buffer for symbol names */
 static NAT approx_PREDICATECOUNTER; /* Used by approx_MonadicFlattenHeads */

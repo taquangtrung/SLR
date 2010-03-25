@@ -55,6 +55,7 @@
 
 #include "symbol.h"
 #include "stack.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Structures                                                 */

@@ -57,6 +57,7 @@
 #include "foldfg.h"
 #include "unify.h"
 #include "vector.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Data Structures and Constants                              */

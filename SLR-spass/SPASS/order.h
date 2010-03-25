@@ -55,6 +55,7 @@
 #include "context.h"
 #include "flags.h"
 #include "symbol.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* TYPES and GLOBAL VARIABLES                                 */

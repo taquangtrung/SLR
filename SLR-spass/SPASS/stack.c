@@ -45,7 +45,7 @@
 /* $RCSfile: stack.c,v $ */
 
 #include "stack.h"
-
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Global Variables                                           */

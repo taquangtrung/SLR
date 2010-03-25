@@ -52,7 +52,7 @@
 #include "unify.h"
 #include "hash.h"
 #include "subsumption.h"
-
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Data Structures and Constants                              */

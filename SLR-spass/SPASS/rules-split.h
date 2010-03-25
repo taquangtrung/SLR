@@ -54,7 +54,7 @@
 
 #include "clause.h"
 #include "search.h"
-
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Function Prototypes                                        */

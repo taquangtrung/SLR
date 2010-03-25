@@ -48,6 +48,7 @@
 
 #include "foldfg.h"
 #include "flags.h"
+#include "../usercode/user-defined.h"
 
 
 SYMBOL  fol_ALL;

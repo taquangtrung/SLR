@@ -55,6 +55,7 @@
 #include "term.h"
 #include "symbol.h"
 #include "list.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Data Structures                                            */

@@ -51,6 +51,7 @@
 #include "flags.h"
 #include "misc.h"
 #include "strings.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Global Declarations                                        */

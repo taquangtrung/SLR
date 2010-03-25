@@ -50,6 +50,7 @@
 /**************************************************************/
 
 #include "rules-split.h"
+#include "../usercode/user-defined.h"
 
 static LIST  split_DeleteClausesDependingOnLevelFromList(PROOFSEARCH,LIST, int, LIST*);
 static LIST  split_DeleteInvalidClausesFromList(PROOFSEARCH, int, LIST);

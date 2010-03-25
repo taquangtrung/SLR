@@ -53,6 +53,7 @@
 #include "term.h"
 #include "foldfg.h"
 #include "clause.h"
+#include "../usercode/user-defined.h"
 
 extern NAT dfg_LINENUMBER;    /* Defined in dfgparser.y */
 LIST       ia_PROOFREQUEST;   /* A pair! */

@@ -56,6 +56,7 @@
 #include "unify.h"
 #include "clause.h"
 #include "flags.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Functions                                                  */

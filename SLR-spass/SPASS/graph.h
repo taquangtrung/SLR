@@ -48,6 +48,7 @@
 #define _GRAPH_
 
 #include "list.h"
+#include "../usercode/user-defined.h"
 
 typedef struct {
   NAT     number;

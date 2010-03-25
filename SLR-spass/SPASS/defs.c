@@ -48,6 +48,7 @@
 #include "cnf.h"
 #include "defs.h"
 #include "foldfg.h"
+#include "../usercode/user-defined.h"
 
 static void def_DeleteFromClauses(DEF);
 static void def_DeleteFromTerm(DEF);

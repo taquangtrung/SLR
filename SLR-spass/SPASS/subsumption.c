@@ -47,6 +47,7 @@
 
 
 #include "subsumption.h"
+#include "../usercode/user-defined.h"
 
 static NAT *multvec_i;
 static NAT *multvec_j;

@@ -51,6 +51,7 @@
 #include <ctype.h>
 #include "strings.h"
 #include "list.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Functions                                                  */

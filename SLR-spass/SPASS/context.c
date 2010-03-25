@@ -46,6 +46,7 @@
 /* $RCSfile: context.c,v $ */
 
 #include "context.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Global Variables                                           */

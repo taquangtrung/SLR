@@ -118,9 +118,7 @@ typedef enum {
 	HIDDEN = 128
 } CLAUSE_FLAGS;
 
-#ifdef _TRUNGTQ_CODE_
 
-#endif
 /* As there are a lot of implications a clauses properties may have */
 /* for the prover, this information should be kept with the clause. */
 /* That for a flagfield is foreseen, most likely an integer used    */

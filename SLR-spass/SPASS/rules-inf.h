@@ -60,6 +60,7 @@
 #include "unify.h"
 #include "st.h"
 #include "defs.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Functions                                                  */

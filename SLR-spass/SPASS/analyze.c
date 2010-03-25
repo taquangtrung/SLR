@@ -47,6 +47,7 @@
 #include <stdio.h>
 
 #include "analyze.h"
+#include "../usercode/user-defined.h"
 
 static LIST ana_CalculatePredicatePrecedence(LIST, LIST);
 static LIST ana_CalculateFunctionPrecedence(LIST, LIST, FLAGSTORE);

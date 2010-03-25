@@ -55,6 +55,7 @@
 #include "term.h"
 #include "ia.h"
 #include "iaparser.h"
+#include "../usercode/user-defined.h"
 
 extern NAT dfg_LINENUMBER;  /* defined in dfgparser.y */
 

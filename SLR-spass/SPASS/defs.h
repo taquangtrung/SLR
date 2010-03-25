@@ -57,6 +57,7 @@
 #include "term.h"
 #include "list.h"
 #include "search.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Structures                                                 */

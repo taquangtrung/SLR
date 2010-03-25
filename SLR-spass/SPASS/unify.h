@@ -57,6 +57,7 @@
 #include "list.h"
 #include "context.h"
 #include "subst.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Functions for Initialization and Controlling               */

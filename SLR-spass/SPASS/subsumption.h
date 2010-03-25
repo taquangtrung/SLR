@@ -58,6 +58,7 @@
 #include "component.h"
 #include "vector.h"
 #include "clause.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Functions                                                 */

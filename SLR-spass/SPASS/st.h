@@ -59,6 +59,7 @@
 
 #include "subst.h"
 #include "unify.h"
+#include "../usercode/user-defined.h"
 
 /**************************************************************/
 /* Data Structures                                            */

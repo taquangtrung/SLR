@@ -42,6 +42,7 @@
 /* $RCSfile: tableau.c,v $ */
 
 #include "tableau.h" 
+#include "../usercode/user-defined.h"
 
 /* for graph output */
 extern BOOL        pcheck_ClauseCg;
