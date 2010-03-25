@@ -212,15 +212,7 @@ static CLAUSE inf_BuildConstraintHyperResolvent(CLAUSE Clause, LIST Lits, SUBST 
 
 			Atom = clause_GetLiteralAtom(ClauseCopy, i);
 
-#ifdef _TRUNGTQ_CODE_
-
-			NewClause = clause_CreateUnnormalized(Constraint, Antecedent, Succedent, list_Nil());
-
-#else
-
 			NewClause = clause_CreateUnnormalized(Constraint, Antecedent, Succedent);
-
-#endif
 
 
 			list_Delete(Constraint);

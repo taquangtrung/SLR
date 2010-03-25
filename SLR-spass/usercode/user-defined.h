@@ -8,7 +8,7 @@
 #ifndef USERDEFINED_H_
 #define USERDEFINED_H_
 
-#define _TRUNGTQ_CODE_			// co the la _TrungTQ_Code hoac _SPASS_Code
+//#define _TRUNGTQ_CODE_			// co the la _TrungTQ_Code hoac _SPASS_Code
 
 enum CodeUser {
 	TrungTQ,
@@ -16,6 +16,6 @@ enum CodeUser {
 	All
 };
 
-static enum CodeUser codeUser = TrungTQ;				// xac dinh doan code se dc chay
+static enum CodeUser codeUser = SPASS;				// xac dinh doan code se dc chay
 
 #endif /* USERDEFINED_H_ */

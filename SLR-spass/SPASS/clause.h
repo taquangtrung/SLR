@@ -225,15 +225,8 @@ void clause_Init(void);
 
 
 
-#ifdef _TRUNGTQ_CODE_
-
-	CLAUSE clause_CreateUnnormalized(LIST, LIST, LIST, LIST);
-
-#else
-
 	CLAUSE clause_CreateUnnormalized(LIST, LIST, LIST);
 
-#endif
 
 CLAUSE clause_CreateFromLiterals(LIST, BOOL, BOOL, BOOL, FLAGSTORE, PRECEDENCE);
 

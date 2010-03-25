@@ -1504,6 +1504,7 @@ int main(int argc, const char* argv[]) {
 		/*
 		 * TTQ_NOTE . Data Input - Nhap du lieu tu File
 		 */
+
 		top_InputFile = argv[opts_Indicator()];
 		InputStream = misc_OpenFile(top_InputFile, "r");
 
