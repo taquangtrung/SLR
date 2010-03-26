@@ -1596,8 +1596,24 @@ int main(int argc, const char* argv[]) {
 
 		Termcount = 0;
 
+		//TTQ_COMMENT . Axioms nay chua cap <Label - term> cua 1 formula
+
 		/* Create labels for formulae without them */
 		for (Scan = Axioms; !list_Empty(Scan); Scan = list_Cdr(Scan), Termcount++) {
+//#ifdef _TRUNGTQ_CODE_
+//
+//			char* s = list_PairFirst(list_Cdr(list_Car(Scan)));
+//			char str[20];
+//			int i = 0;
+//			while (*s != 0) {
+//				str[i] = *s;
+//				s = s +1;
+//				i++;
+//			}
+//			str[i+1] == 0;
+//
+//#endif
+
 			if (list_PairFirst(list_Car(Scan)) == NULL) {
 				char L[100];
 				char* Label;
@@ -1640,6 +1656,8 @@ int main(int argc, const char* argv[]) {
 			clock_StopPassedTime(clock_TRANSL);
 		}
 
+
+
 		if (flag_GetFlagValue(Flags, flag_APPLYDEFS) != flag_APPLYDEFSOFF) {
 			def_ExtractDefsFromTermlist(Search, Axioms, Conjectures);
 			Conjectures = def_ApplyDefinitionToTermList(
@@ -1652,9 +1670,19 @@ int main(int argc, const char* argv[]) {
 		/* Axioms is list of pairs, conjectures is list of terms */
 		/* A ProofSearch object is only returned and the symbols kept in Symblist
 		 if flag_INTERACTIVE is set */
+#ifdef _TRUNGTQ_CODE_
+		for (Scan = Conjectures; !list_Empty(Scan); Scan = list_Cdr(Scan), Termcount++) {
+			TERM tempTerm = (TERM)list_Car(Scan);
+			term_Print(tempTerm);
+
+			char s = 3;
+		}
+#endif
 		FlotterSearch = cnf_Flotter(Axioms, Conjectures, &InputClauses,
 				&Labellist, TermLabelToClauselist, ClauseToTermLabellist,
 				Flags, Precedence, &Symblist);
+
+
 
 		/*
 		 * TTQ_NOTE . Tinh duoc InputClauses sau  buoc nay

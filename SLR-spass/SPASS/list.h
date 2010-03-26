@@ -377,4 +377,18 @@ static __inline__ LIST list_AssocCons(LIST L, POINTER Key, POINTER Value) {
 	return list_Cons(list_PairCreate(Key, Value), L);
 }
 
+#ifdef _TRUNGTQ_CODE_
+
+static __inline__ char* list_GetFirstItemData(LIST L) {
+	char* s = (char*)list_PairFirst(L);
+	return *s;
+
+}
+
 #endif
+
+
+#endif
+
+
+

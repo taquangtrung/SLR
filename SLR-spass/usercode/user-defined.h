@@ -5,6 +5,8 @@
  *      Author: trungtq
  */
 
+//#include "../SPASS/list.h"
+
 #ifndef USERDEFINED_H_
 #define USERDEFINED_H_
 
@@ -17,5 +19,7 @@ enum CodeUser {
 };
 
 static enum CodeUser codeUser = SPASS;				// xac dinh doan code se dc chay
+
+
 
 #endif /* USERDEFINED_H_ */
