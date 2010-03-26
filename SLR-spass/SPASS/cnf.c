@@ -3683,22 +3683,21 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 		HASH ClauseToTermLabellist, FLAGSTORE InputFlags,
 		PRECEDENCE InputPrecedence, LIST* Symblist)
 /**************************************************************
- INPUT:   A list of axiom formulae,
- a list of conjecture formulae,
- a pointer to a list in which clauses derived from axiom formulae
- are stored,
- a pointer to a list in which clauses derived from
- conjecture formulae are stored, ???
- a pointer to a list of all termlabels,
- a hasharray in which for every term label the list of clauses
- derived from the term is stored (if DocProof is set),
- a hasharray in which for every clause the list of labels
- of the terms used for deriving the clause is stored (if DocProof
- is set),
- a flag store,
- a precedence
- a pointer to a list of symbols which have to be deleted later if
- the ProofSearch object is kept.
+ INPUT:  AxiomList - 		A list of axiom formulae,
+		 ConjectureList - 	a list of conjecture formulae,
+		 AxClauses -		a pointer to a list in which clauses derived from axiom formulae
+			 are stored,
+//		  - a pointer to a list in which clauses derived from
+//			 conjecture formulae are stored, ???
+		 AllLables -  a pointer to a list of all termlabels,
+		 TermLabelToClauseList - a hasharray in which for every term label the list of clauses
+			 derived from the term is stored (if DocProof is set),
+		 ClauseToTermLabellist - a hasharray in which for every clause the list of labels
+			 of the terms used for deriving the clause is stored (if DocProof is set),
+		 InputFlags - a flag store,
+		 InputPrecedence - a precedence
+		 Symblist - a pointer to a list of symbols which have to be deleted later if
+			 the ProofSearch object is kept.
  RETURNS: If KeepProofSearch ??? is TRUE, then the ProofSearch object is not
  freed but returned.
  Else, NULL is returned.
@@ -3875,6 +3874,28 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 
 	*Symblist = list_Nil();
 	for (Scan = AllFormulae; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
+
+#ifdef _TRUNGTQ_CODE_
+/*
+		// print LABEL & TERM of a FORMULAE
+		char* tempLabel = (char*) list_PairFirst((LIST) list_Car(Scan));
+		printf("Label: %s - Term: ", tempLabel);
+		TERM tempTerm = (TERM) list_PairSecond((LIST) list_Car(Scan));
+		term_Print(tempTerm);
+		printf("\n");
+*/
+		// Tach lay LABEL cua FORMULAE hien tai
+		BOOL hasJustification = FALSE;
+		char* formulaeLabel = (char*) list_PairFirst((LIST) list_Car(Scan));
+		char* markString = "justification";
+		if (strncmp(formulaeLabel, markString, strlen(markString)) == 0) {
+
+		}
+
+		// TODO . Dang code - tach lay justfication tu phan label cua formulae
+		// va ghep vao clause
+#endif
+
 		LIST Ax, Pair;
 		UsedTerms = list_Nil();
 		Pair = list_Car(Scan);
@@ -3883,11 +3904,10 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 		term_Print((TERM) list_PairSecond(Pair));
 		printf("\nLabel : %s", (char*) list_PairFirst(Pair));
 #endif
-		Ax
-				= cnf_OptimizedSkolemization(Search, term_Copy(
-						(TERM) list_PairSecond(Pair)), (char*) list_PairFirst(
-						Pair), &UsedTerms, Symblist, Result, FALSE,
-						InputClauseToTermLabellist);
+		Ax = cnf_OptimizedSkolemization(Search, term_Copy(
+				(TERM) list_PairSecond(Pair)), (char*) list_PairFirst(
+				Pair), &UsedTerms, Symblist, Result, FALSE,
+				InputClauseToTermLabellist);
 		/* Set CONCLAUSE flag for clauses derived from conjectures */
 		if (list_PointerMember(ConjectureList, list_PairSecond(Pair))) {
 			LIST l;

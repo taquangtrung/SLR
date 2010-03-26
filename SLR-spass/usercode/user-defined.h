@@ -18,7 +18,7 @@ enum CodeUser {
 	All
 };
 
-static enum CodeUser codeUser = SPASS;				// xac dinh doan code se dc chay
+static enum CodeUser codeUser = TrungTQ;				// xac dinh doan code se dc chay
 
 
 

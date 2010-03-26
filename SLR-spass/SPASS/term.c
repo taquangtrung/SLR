@@ -1559,7 +1559,6 @@ void term_Print(TERM Term)
     putchar(' ');
     term_TermListPrint(term_ArgumentList(Term));
     putchar(')');
-
   } else if (term_IsVariable(Term)) {
 
     symbol_Print(term_TopSymbol(Term));
@@ -1572,6 +1571,7 @@ void term_Print(TERM Term)
     putchar(')');
   }
 }
+
 
 static void term_PrettyPrintIntern(TERM Term, int Depth)
 /**************************************************************

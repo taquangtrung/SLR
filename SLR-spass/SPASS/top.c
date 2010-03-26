@@ -1667,21 +1667,27 @@ int main(int argc, const char* argv[]) {
 		/* We must keep the list of symbols because they can't be freed in cnf_Flotter */
 		Symblist = list_Nil();
 
+#ifdef _TRUNGTQ_CODE_
+/*
+ * 		// Print LABEL & TERM of a FORMULAE
+		printf("==========++++++++++++++++++============\n");
+		for (Scan = Axioms; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
+				char* Label = (char*) list_PairFirst((LIST) list_Car(Scan));
+				printf("Label: %s -", Label);
+				TERM ConTerm = (TERM) list_PairSecond((LIST) list_Car(Scan));
+				term_Print(ConTerm);
+				printf("\n");
+			}
+*/
+#endif
+
+
 		/* Axioms is list of pairs, conjectures is list of terms */
 		/* A ProofSearch object is only returned and the symbols kept in Symblist
 		 if flag_INTERACTIVE is set */
-#ifdef _TRUNGTQ_CODE_
-		for (Scan = Conjectures; !list_Empty(Scan); Scan = list_Cdr(Scan), Termcount++) {
-			TERM tempTerm = (TERM)list_Car(Scan);
-			term_Print(tempTerm);
-
-			char s = 3;
-		}
-#endif
 		FlotterSearch = cnf_Flotter(Axioms, Conjectures, &InputClauses,
 				&Labellist, TermLabelToClauselist, ClauseToTermLabellist,
 				Flags, Precedence, &Symblist);
-
 
 
 		/*

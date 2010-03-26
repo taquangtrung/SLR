@@ -396,7 +396,7 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 
 #ifdef _TRUNGTQ_CODE_
 
-	LIST clause_CopyJustified(CLAUSE Clause)
+	LIST clause_CopyJustification(CLAUSE Clause)
 	/**************************************************************
 	 INPUT:   A clause.
 	 RETURNS: The list of copied JUSTIFIED literals o dang TERM (ko co dau) from <Clause>.
@@ -418,7 +418,7 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 		return list;
 	}
 
-	LIST clause_CopyJustifiedExcept(CLAUSE Clause, int i)
+	LIST clause_CopyJustificationExcept(CLAUSE Clause, int i)
 	/**************************************************************
 	 INPUT:   A clause.
 	 RETURNS: A list containing copies of all JUSTFIED literals
@@ -2528,7 +2528,7 @@ void clause_Init(void)
 
 #ifdef _TRUNGTQ_CODE_
 
-	CLAUSE clause_CreateBody(int ClauseLength, int JustifiedLength)
+	CLAUSE clause_CreateBody(int ClauseLength, int JustificationLength)
 	/**************************************************************
 	 * JUSTIFIED
 	 *
@@ -2559,8 +2559,8 @@ void clause_Init(void)
 			Result->literals = (LITERAL *) memory_Malloc((ClauseLength)
 					* sizeof(LITERAL));
 
-		if (JustifiedLength != 0)
-			Result->justifiedLiterals = (LITERAL *) memory_Malloc((JustifiedLength)
+		if (JustificationLength != 0)
+			Result->justifiedLiterals = (LITERAL *) memory_Malloc((JustificationLength)
 					* sizeof(LITERAL));
 
 		clause_SetFromInput(Result);
@@ -2610,7 +2610,7 @@ void clause_Init(void)
 
 #ifdef _TRUNGTQ_CODE_
 
-	CLAUSE clause_Create(LIST Constraint, LIST Antecedent, LIST Succedent, LIST Justified,
+	CLAUSE clause_Create(LIST Constraint, LIST Antecedent, LIST Succedent, LIST Justification,
 			FLAGSTORE Flags, PRECEDENCE Precedence)
 	/**************************************************************
 	 INPUT:   Three lists of pointers to atoms, a flag store and
@@ -2635,7 +2635,7 @@ void clause_Init(void)
 		Result->c = (c = list_Length(Constraint));
 		Result->a = (a = list_Length(Antecedent));
 		Result->s = (s = list_Length(Succedent));
-		Result->j = (j = list_Length(Justified));
+		Result->j = (j = list_Length(Justification));
 
 		if (!clause_IsEmptyClause(Result)) {
 			Result->literals = (LITERAL *) memory_Malloc((c + a + s) * sizeof(LITERAL));
@@ -2664,8 +2664,8 @@ void clause_Init(void)
 
 		// them justified
 		for (int d = 0; d < j; d++) {
-			Result->justifiedLiterals[d] = clause_LiteralCreate((TERM) list_Car(Justified), Result);
-			Justified = list_Cdr(Justified);
+			Result->justifiedLiterals[d] = clause_LiteralCreate((TERM) list_Car(Justification), Result);
+			Justification = list_Cdr(Justification);
 		}
 
 		clause_OrientAndReInit(Result, Flags, Precedence);
@@ -2738,7 +2738,7 @@ void clause_Init(void)
 
 
 #ifdef _TRUNGTQ_CODE_
-	CLAUSE clause_CreateCrude(LIST Constraint, LIST Antecedent, LIST Succedent, LIST Justified,
+	CLAUSE clause_CreateCrude(LIST Constraint, LIST Antecedent, LIST Succedent, LIST Justification,
 			BOOL Con)
 	/**************************************************************
 	 INPUT:   Three lists of pointers to literals (!) and a Flag indicating
@@ -2772,7 +2772,7 @@ void clause_Init(void)
 		Result->c = (c = list_Length(Constraint));
 		Result->a = (a = list_Length(Antecedent));
 		Result->s = (s = list_Length(Succedent));
-		Result->j = (j = list_Length(Justified));
+		Result->j = (j = list_Length(Justification));
 
 		if (!clause_IsEmptyClause(Result)) {
 			Result->literals = (LITERAL *) memory_Malloc((c + a + s) * sizeof(LITERAL));
@@ -2800,8 +2800,8 @@ void clause_Init(void)
 
 		for (int d = 0; d < j; d++) {
 			Result->literals[d]
-					= clause_LiteralCreate(list_Car(Justified), Result);
-			Justified = list_Cdr(Justified);
+					= clause_LiteralCreate(list_Car(Justification), Result);
+			Justification = list_Cdr(Justification);
 		}
 
 		clause_SetFromInput(Result);

@@ -1005,51 +1005,6 @@ void symbol_FPrint(FILE* File, SYMBOL Symbol)
 }
 
 
-#ifdef _TRUNGTQ_CODE_
-
-char* symbol_GetName(SYMBOL Symbol)
-/**************************************************************
-  INPUT:   A file and a symbol.
-  RETURNS: None.
-  SUMMARY: Prints a symbol to the file.
-***************************************************************/
-{
-#ifdef CHECK
-  if (!symbol_IsSymbol(Symbol)) {
-    misc_StartErrorReport();
-    misc_ErrorReport("\n In symbol_FPrint: Illegal input.\n");
-    misc_FinishErrorReport();
-  }
-#endif
-
-  char* name;
-
-  if (symbol_Equal(symbol_Null(),Symbol))
-    name ="NULL";
-  else if (symbol_IsVariable(Symbol)) {
-    SYMBOL NormSymbol;
-
-    NormSymbol = symbol_NormVar(Symbol);
-
-    if (symbol_IsStandardVariable(Symbol)) {
-      sprintf(name,"%s", symbol_STDVARIABLENAMES[NormSymbol-1]);
-    }
-    else if (symbol_IsIndexVariable(Symbol))
-      /* I1, I2, I3, ... */
-      sprintf(name,"I%d", NormSymbol);
-
-
-  }
-  else if (symbol_SignatureExists())
-    name = symbol_Name(Symbol);
-  else
-	  sprintf(name, "%d", Symbol);
-
-  return name;
-}
-
-#endif
-
 void symbol_FPrintOtter(FILE* File, SYMBOL Symbol)
 /**************************************************************
   INPUT:   A file and a symbol.
