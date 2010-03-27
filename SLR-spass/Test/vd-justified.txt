@@ -8,19 +8,13 @@ description({* Sokrates is human and since all humans are mortal, he is mortal t
 end_of_list.
 
 list_of_symbols.
-  functions[(sokrates,0), (alibaba,0), (Justification, 2)].
+  functions[(sokrates,0), (alibaba,0), (aladanh, 0)].
   predicates[(Human,1),(Mortal,1)].
 end_of_list.
 
-list_of_declarations.
-  subsorts(Justification).
-  Justification(x, y).
-end_of_list.
-
-
 list_of_formulae(axioms).
 
-formula(Justification(Human(sokrates), alibaba), label).
+formula(implies(Human(sokrates), or(Human(alibaba), Mortal(aladanh))), Justification_1).
 formula(Human(sokrates), 2).
 formula(forall([x],implies(Human(x),Mortal(x))),3).
 

@@ -3872,29 +3872,38 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 	/*cnf_CheckClauseListsConsistency(ShIndex); */
 #endif
 
-	*Symblist = list_Nil();
-	for (Scan = AllFormulae; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
-
+	/*
+	 * Duyet tat ca cac clause va tim justification, roi sau day chinh sua cac clause
+	 */
 #ifdef _TRUNGTQ_CODE_
-/*
+	printf("=============+++++++++++++++===============\n");
+	printf("Raw input clauses:\n");
+	for (Scan = AllFormulae; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
 		// print LABEL & TERM of a FORMULAE
 		char* tempLabel = (char*) list_PairFirst((LIST) list_Car(Scan));
 		printf("Label: %s - Term: ", tempLabel);
 		TERM tempTerm = (TERM) list_PairSecond((LIST) list_Car(Scan));
 		term_Print(tempTerm);
 		printf("\n");
-*/
+
 		// Tach lay LABEL cua FORMULAE hien tai
 		BOOL hasJustification = FALSE;
 		char* formulaeLabel = (char*) list_PairFirst((LIST) list_Car(Scan));
-		char* markString = "justification";
+		char* markString = "Justification";
 		if (strncmp(formulaeLabel, markString, strlen(markString)) == 0) {
+			printf("======> Co justification\n");
+			// TODO . Dang code - tach lay justfication tu phan label cua formulae
+			// va ghep vao clause
 
 		}
-
-		// TODO . Dang code - tach lay justfication tu phan label cua formulae
-		// va ghep vao clause
+	}
 #endif
+
+
+	*Symblist = list_Nil();
+	for (Scan = AllFormulae; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
+
+
 
 		LIST Ax, Pair;
 		UsedTerms = list_Nil();
