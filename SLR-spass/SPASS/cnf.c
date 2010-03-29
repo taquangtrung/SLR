@@ -3967,14 +3967,24 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 		 * Neu clause co jutified literal thi ghep vao cac clause
 		 */
 		if (justifiedTermList != NULL) {
-			LIST l;
-			for (l = Ax; !list_Empty(l); l = list_Cdr(l)) {
-				// TODO . dang code - add justified clause
-			}
+			LIST clauseList;
+			for (clauseList = Ax; !list_Empty(clauseList); clauseList = list_Cdr(clauseList)) {
+				CLAUSE tempClause = (CLAUSE)list_Car(clauseList);
 
+				// tinh justified literals
+				LIST justifiedLiteralList = NULL;
+				LIST termList;
+				for (termList = justifiedTermList; !list_Empty(termList); termList = list_Cdr(termList)) {
+					TERM tempTerm = (TERM)list_Car(termList);
+					LITERAL tempLiteral = clause_LiteralCreate(tempTerm, tempClause);
+					justifiedLiteralList = list_Cons(tempLiteral, justifiedLiteralList);
+				}
+
+				// bo sung justified literals vao clause
+				clause_SetJustifiedLiterals(tempClause, justifiedLiteralList);
+			}
 		}
 #endif
-
 
 		/* Set CONCLAUSE flag for clauses derived from conjectures */
 		if (list_PointerMember(ConjectureList, list_PairSecond(Pair))) {

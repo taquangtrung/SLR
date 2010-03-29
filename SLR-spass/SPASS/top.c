@@ -1689,7 +1689,6 @@ int main(int argc, const char* argv[]) {
 				&Labellist, TermLabelToClauselist, ClauseToTermLabellist,
 				Flags, Precedence, &Symblist);
 
-
 		/*
 		 * TTQ_NOTE . Tinh duoc InputClauses sau  buoc nay
 		 */

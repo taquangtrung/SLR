@@ -1075,6 +1075,23 @@ static __inline__ void clause_SetParentLiterals(CLAUSE Clause, LIST PLits) {
 	Clause->parentLits = PLits;
 }
 
+#ifdef _TRUNGTQ_CODE_
+
+	static __inline__ void clause_SetJustifiedLiterals(CLAUSE Clause, LIST PLits) {
+		int j = list_Length(PLits);
+		Clause->j = j;
+		Clause->justifiedLiterals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
+		for (int d = 0; d < j; d++) {
+			LITERAL tempLiteral = list_Car(PLits);
+			clause_LiteralSetOwningClause(tempLiteral, Clause);
+			Clause->justifiedLiterals[d] = tempLiteral;
+			PLits = list_Cdr(PLits);
+		}
+
+	}
+
+#endif
+
 static __inline__ void clause_AddParentLiteral(CLAUSE Clause, int PLit) {
 	Clause->parentLits = list_Cons((POINTER) PLit, Clause->parentLits);
 }

@@ -2799,7 +2799,7 @@ void clause_Init(void)
 		}
 
 		for (int d = 0; d < j; d++) {
-			Result->literals[d]
+			Result->justifiedLiterals[d]
 					= clause_LiteralCreate(list_Car(Justification), Result);
 			Justification = list_Cdr(Justification);
 		}
@@ -4102,8 +4102,19 @@ void clause_Print(CLAUSE Clause)
 		}
 		putchar('.');
 
-#ifdef _TRUNGTQ_Code
+#ifdef _TRUNGTQ_CODE_
 		// In cac justified literals
+		LIST justifiedList = clause_GetJustifiedLiteralList(Clause);
+		if (justifiedList != NULL) {
+			printf(" --- justified literals: ");
+
+			for (; !list_Empty(justifiedList); justifiedList = list_Cdr(justifiedList)) {
+				LITERAL tempLiteral = list_Car(justifiedList);
+				clause_LiteralPrint(tempLiteral);
+				printf(" -- ");
+			}
+		}
+
 #endif
 
 	}
