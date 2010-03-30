@@ -305,6 +305,9 @@ static BOOL inf_LiteralsMaxWith2Subst(CLAUSE Clause, int i, CLAUSE PartnerClause
 
 LIST inf_EqualityResolution(CLAUSE GivenClause, BOOL Ordered, FLAGSTORE Flags,
 		PRECEDENCE Precedence)
+
+// EQUALITY resolution => KO can sua justification
+
 /**************************************************************
  INPUT:   A clause and a flag determining whether ordering
  constraints apply.
@@ -398,6 +401,9 @@ LIST inf_EqualityResolution(CLAUSE GivenClause, BOOL Ordered, FLAGSTORE Flags,
 
 static CLAUSE inf_ApplyEqualityFactoring(CLAUSE Clause, TERM Left, TERM Right, int i, int j,
 		SUBST Subst, FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// co EQUALITY - KO can thay doi Justification
+
 /**************************************************************
  INPUT:   A clause, two terms, two indices in the clause,
  a substitution, a flag store and a precedence.
@@ -762,6 +768,9 @@ static TERM inf_AllTermsLeftRplac(TERM Term, TERM TestTerm, TERM RplacTerm, SUBS
 static CLAUSE inf_ApplyGenSuperposition(CLAUSE Clause, int ci, SUBST Subst, CLAUSE PartnerClause,
 		int pci, SUBST PartnerSubst, TERM SupAtom, BOOL Right, BOOL OrdPara, BOOL MaxPara,
 		FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// SUPERPOSITION => KO can sua justification
+
 /**************************************************************
  INPUT:  Two clauses where a generalized superposition inference can be
  applied using the positive equality literal <i> from <Clause> with
@@ -1474,6 +1483,9 @@ LIST inf_GenSuperpositionRight(CLAUSE GivenClause, SHARED_INDEX ShIndex, BOOL Or
 static LIST inf_ApplyMParamod(CLAUSE C1, CLAUSE C2, int i, int j, int k, TERM u_tau, TERM v,
 		TERM s2, TERM t, TERM v2_sigma, SUBST tau, SUBST rho, FLAGSTORE Flags,
 		PRECEDENCE Precedence)
+
+// Su dung PARAMODULATION => KO can sua Justification
+
 /**************************************************************
  INPUT:   Two clauses, <i> is a literal index in <C1>, <j> and <k>
  are literal indices in <C2>, <u_tau> with <rho> applied
@@ -1991,6 +2003,8 @@ LIST inf_MergingParamodulation(CLAUSE GivenClause, SHARED_INDEX ShIndex, FLAGSTO
 
 static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 		SUBST SubstPartnerTermS, FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// TODO - dang code . CO thay doi Justification, sung dung General Resolution
 /**************************************************************
  INPUT:   A clause to use for Resolution, the index of a
  positive non-equality literal, a unifiable literal,

@@ -928,6 +928,9 @@ void prfs_Print(PROOFSEARCH Search)
 }
 
 CLAUSE prfs_DoSplitting(PROOFSEARCH PS, CLAUSE SplitClause, LIST Literals)
+
+// TODO . dang code - co they phai thay doi Justification
+
 /**************************************************************
  INPUT:   An proof search object, an unshared clause to be splitted
  where 'Literals' is the list of literals to keep (in their

@@ -1044,6 +1044,9 @@ static PROOFSEARCH top_ProofSearch(PROOFSEARCH Search, LIST ProblemClauses,
 
 	if (flag_GetFlagValue(Flags, flag_RINPUT)) {
 		clock_StartCounter(clock_REDUCTION);
+		/*
+		 * Reduce input tai day
+		 */
 		EmptyClauses = red_ReduceInput(Search, ProblemClauses);
 		clock_StopAddPassedTime(clock_REDUCTION);
 		if (list_Empty(EmptyClauses) && flag_GetFlagValue(Flags, flag_SATINPUT))
@@ -1694,29 +1697,29 @@ int main(int argc, const char* argv[]) {
 		 */
 		InputClauses = clause_ListSortWeighed(InputClauses);
 
-		if (codeUser == TrungTQ) {
-			printf("============== begin print Input clauses\n");
-			for (int ii = 1; ii <= list_Length(InputClauses); ii++) {
-				printf("== clause %d:\n", ii);
-				CLAUSE tempClause = list_NthElement(InputClauses, ii );
-				if (tempClause != NULL) {
-					LIST lstLit = clause_GetLiteralList(tempClause);
-					for (int jj = 1; jj <= list_Length(lstLit); jj++) {
-						printf("===== literal %d:", jj);
-						LITERAL tempLit = list_NthElement(lstLit, jj);
-						if (tempLit != NULL) {
-							clause_LiteralPrint(tempLit);
-							printf(" --- ");
-							CLAUSE owningClause = clause_LiteralOwningClause(tempLit);
-							clause_Print(owningClause);
-						}
-						printf("\n");
-					}
-				}
-				printf("\n");
-			}
-			printf("============== end\n");
-		}
+//		if (codeUser == TrungTQ) {
+//			printf("============== begin print Input clauses\n");
+//			for (int ii = 1; ii <= list_Length(InputClauses); ii++) {
+//				printf("== clause %d:\n", ii);
+//				CLAUSE tempClause = list_NthElement(InputClauses, ii );
+//				if (tempClause != NULL) {
+//					LIST lstLit = clause_GetLiteralList(tempClause);
+//					for (int jj = 1; jj <= list_Length(lstLit); jj++) {
+//						printf("===== literal %d:", jj);
+//						LITERAL tempLit = list_NthElement(lstLit, jj);
+//						if (tempLit != NULL) {
+//							clause_LiteralPrint(tempLit);
+//							printf(" --- ");
+//							CLAUSE owningClause = clause_LiteralOwningClause(tempLit);
+//							clause_Print(owningClause);
+//						}
+//						printf("\n");
+//					}
+//				}
+//				printf("\n");
+//			}
+//			printf("============== end\n");
+//		}
 
 		clause_SetCounter(1);
 		for (Scan = InputClauses; !list_Empty(Scan); Scan = list_Cdr(Scan)) {

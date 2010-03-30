@@ -175,6 +175,9 @@ static void red_DocumentObviousReductions(CLAUSE Clause, LIST Indexes)
 
 static BOOL red_ObviousReductions(CLAUSE Clause, BOOL Document,
 		FLAGSTORE Flags, PRECEDENCE Precedence, CLAUSE *Changed)
+
+// da fix ADD justification
+
 /**********************************************************
  INPUT:   A clause, a boolean flag for proof
  documentation, a flag store and a precedence.
@@ -3275,6 +3278,9 @@ static BOOL red_SortSimplification(SORTTHEORY Theory, CLAUSE Clause, NAT Level,
 }
 
 static void red_ExchangeClauses(CLAUSE *RedClause, CLAUSE *Copy, LIST *Result)
+
+// KO thay doi justification
+
 /**********************************************************
  INPUT:   Two pointers to clauses and a pointer to a list.
  RETURNS: Nothing.
@@ -4468,6 +4474,9 @@ LIST red_SatUnit(PROOFSEARCH Search, LIST ClauseList)
 
 static CLAUSE red_SpecialInputReductions(CLAUSE Clause, FLAGSTORE Flags,
 		PRECEDENCE Precedence)
+
+// ham nay KO can sua justified
+
 /*********************************************************
  INPUT:   A clause and a flag store.
  RETURNS: The clause where the logical constants TRUE, FALSE
