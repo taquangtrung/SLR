@@ -160,6 +160,10 @@ static CLAUSE inf_BuildConstraintHyperResolvent(CLAUSE Clause, LIST Lits, SUBST 
 	BOOL IsFromEmptySort;
 	LIST Partners;
 
+#ifdef _TRUNGTQ_CODE_
+	LIST Justification = list_Nil();
+#endif
+
 	ParentCls = list_Nil();
 	ParentLits = list_Nil();
 	Constraint = list_Nil();
@@ -215,7 +219,8 @@ static CLAUSE inf_BuildConstraintHyperResolvent(CLAUSE Clause, LIST Lits, SUBST 
 
 #ifdef _TRUNGTQ_CODE_
 
-			NewClause = clause_CreateUnnormalized(Constraint, Antecedent, Succedent);
+			//TODO - dang code : thay justification tai day
+			NewClause = clause_CreateUnnormalized(Constraint, Antecedent, Succedent, list_Nil());
 
 #else
 

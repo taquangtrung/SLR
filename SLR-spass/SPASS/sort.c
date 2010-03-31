@@ -1593,6 +1593,9 @@ static LIST sort_ApproxPseudoLinear(LIST Constraint, TERM Head, SYMBOL Var)
 }
 
 static LIST sort_ApproxHornClauses(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// fixed: da add justification
+
 /**************************************************************
  INPUT:   A clause to make special horn clauses from, a flag
  store and a precedence.
@@ -1641,7 +1644,8 @@ static LIST sort_ApproxHornClauses(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Pr
 
 #ifdef _TRUNGTQ_CODE_
 
-				NewClause = clause_Create(NewConstraint, list_Nil(), NewSuccedent, list_Nil(), Flags, Precedence);
+				LIST NewJustification = (LIST)clause_CopyJustification(Clause);
+				NewClause = clause_Create(NewConstraint, list_Nil(), NewSuccedent, NewJustification, Flags, Precedence);
 
 #else
 
@@ -1664,6 +1668,9 @@ static LIST sort_ApproxHornClauses(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Pr
 }
 
 LIST sort_ApproxMaxDeclClauses(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// fixed: da add justification
+
 /**************************************************************
  INPUT:   A declaration clause to make special horn clauses
  from, a flag store and a precedence.
@@ -1702,8 +1709,8 @@ LIST sort_ApproxMaxDeclClauses(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Preced
 
 			for (j = clause_FirstLitIndex(); j <= lc; j++)
 				if (clause_LitsHaveCommonVar(LitK, clause_GetLiteral(Clause, j)))
-					NewConstraint = list_Cons(term_Copy(clause_LiteralAtom(clause_GetLiteral(
-							Clause, j))), NewConstraint);
+					NewConstraint =
+						list_Cons(term_Copy(clause_LiteralAtom(clause_GetLiteral(Clause, j))), NewConstraint);
 
 			if (!list_Empty(NewConstraint))
 				NewConstraint = sort_ApproxPseudoLinear(NewConstraint, list_Car(NewSuccedent),
@@ -1711,7 +1718,8 @@ LIST sort_ApproxMaxDeclClauses(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Preced
 
 #ifdef _TRUNGTQ_CODE_
 
-			NewClause = clause_Create(NewConstraint, list_Nil(), NewSuccedent, list_Nil(), Flags, Precedence);
+			LIST NewJustification = (LIST)clause_CopyJustification(Clause);
+			NewClause = clause_Create(NewConstraint, list_Nil(), NewSuccedent, NewJustification, Flags, Precedence);
 
 #else
 

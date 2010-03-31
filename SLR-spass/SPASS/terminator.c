@@ -90,6 +90,9 @@ static LIST red_GetTerminatorPartnerLits(TERM Atom, LITERAL Lit, BOOL UnitsOnly,
 }
 
 static CLAUSE red_CreateTerminatorEmptyClause(LIST FoundMap, FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// fixed: ham nay ko can phai edit justification
+
 /**************************************************************
  INPUT:   A list of pairs (l1, l2), where l1 and l2 are unifiable
  literals with complementary sign and a flag store.

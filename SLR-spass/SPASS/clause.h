@@ -251,6 +251,11 @@ LIST clause_CopyAntecedentExcept(CLAUSE, int);
 LIST clause_CopySuccedent(CLAUSE);
 LIST clause_CopySuccedentExcept(CLAUSE, int);
 
+#ifdef _TRUNGTQ_CODE_
+	LIST clause_CopyJustification(CLAUSE Clause);
+	LIST clause_CopyJustificationExcept(CLAUSE Clause, int);
+#endif
+
 /**************************************************************/
 /* Functions to use the sharing for clauses and literals.     */
 /**************************************************************/

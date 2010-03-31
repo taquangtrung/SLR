@@ -4236,6 +4236,9 @@ static BOOL red_CDReduce(SORTTHEORY Theory, CLAUSE RedClause, FLAGSTORE Flags,
 
 BOOL red_ClauseDeletion(SORTTHEORY Theory, CLAUSE RedClause, FLAGSTORE Flags,
 		PRECEDENCE Precedence)
+
+// fixed: da edit, add them justification
+
 /**************************************************************
  INPUT:   A sort theory, a clause (unshared), a flag store
  and a precedence.
@@ -4284,7 +4287,8 @@ BOOL red_ClauseDeletion(SORTTHEORY Theory, CLAUSE RedClause, FLAGSTORE Flags,
 
 #ifdef _TRUNGTQ_CODE_
 
-		ConstraintClause = clause_Create(Scan, list_Nil(), list_Nil(), list_Nil(), Flags, Precedence);
+		LIST NewJustification = clause_CopyJustification(RedClause);
+		ConstraintClause = clause_Create(Scan, list_Nil(), list_Nil(), NewJustification, Flags, Precedence);
 
 #else
 

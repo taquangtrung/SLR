@@ -439,6 +439,41 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 		return list;
 	}
 
+	LIST clause_MergeJustitication(LIST JustList1, LIST JustList2)
+	/*********************************
+	 * Ghep 2 list Justification thanh 1 list, loai bo cac phan tu trung nhau
+	 *********************************/
+	{
+
+		LIST list = list_Nil();
+
+		for (LIST scan = JustList1; !list_Empty(scan); scan = list_Cdr(scan))
+		{
+			TERM atom = term_Copy(list_Car(scan));
+			list = list_Cons(atom, list);
+		}
+
+		for (LIST scan2 = JustList2; !list_Empty(scan2); scan = list_Cdr(scan2))
+		{
+			TERM atom2 = term_Copy(list_Car(scan2));
+			BOOL isConcisive = FALSE;
+
+			for (LIST scan1 = JustList1; !list_Empty(scan1); scan1 = list_Cdr(scan1)) {
+				TERM atom1 = term_Copy(list_Car(scan1));
+				// chi can so sanh 2 term theo symbol
+				if (term_CompareBySymbolOccurences(atom1, atom2) == 0) {
+					isConcisive = TRUE;
+					break;
+				}
+			}
+
+			if (isConcisive == FALSE)
+				list = list_Cons(atom2, list);
+		}
+
+		return list;
+	}
+
 #endif
 
 /**************************************************************/
