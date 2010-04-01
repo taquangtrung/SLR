@@ -410,7 +410,7 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 
 		list = list_Nil();
 
-		for (int index = 0; index <= clause_NumOfJustifiedLits(Clause); index++) {
+		for (int index = 0; index < clause_NumOfJustifiedLits(Clause); index++) {
 			atom = term_Copy(clause_LiteralAtom(Clause->justifiedLiterals[index]));
 			list = list_Cons(atom, list);
 		}
@@ -453,7 +453,7 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 			list = list_Cons(atom, list);
 		}
 
-		for (LIST scan2 = JustList2; !list_Empty(scan2); scan = list_Cdr(scan2))
+		for (LIST scan2 = JustList2; !list_Empty(scan2); scan2 = list_Cdr(scan2))
 		{
 			TERM atom2 = term_Copy(list_Car(scan2));
 			BOOL isConcisive = FALSE;
@@ -3787,7 +3787,7 @@ BOOL clause_IsHornClause(CLAUSE Clause)
 
 #ifdef _TRUNGTQ_CODE_
 	BOOL clause_HasJustifiedLiterals(CLAUSE Clause) {
-		if (Clause->j == 0)
+		if (Clause->j <= 0)
 			return FALSE;
 		else
 			return TRUE;

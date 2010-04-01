@@ -91,6 +91,9 @@ static LIST inf_GetURPartnerLits(TERM Atom, LITERAL Lit, BOOL Unit, SHARED_INDEX
 
 static CLAUSE inf_CreateURUnitResolvent(CLAUSE Clause, int i, SUBST Subst, LIST FoundMap,
 		FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// TODO - dang fix justification (xem lai RESOLUTION ntn)
+
 /**************************************************************
  INPUT:   A non-unit clause, a literal index from the clause,
  a substitution, a list of pairs (l1, l2) of literals,
@@ -115,13 +118,17 @@ static CLAUSE inf_CreateURUnitResolvent(CLAUSE Clause, int i, SUBST Subst, LIST 
 	Parents = list_List(Atom);
 
 #ifdef _TRUNGTQ_CODE_
+	LIST Justification = list_Nil();
+	if (clause_HasJustifiedLiterals(Clause) == TRUE) {
+		Justification  = (LIST)clause_CopyJustification(Clause);
+	}
 
 	if (i <= clause_LastConstraintLitIndex(Clause))
-			Result = clause_Create(Parents, list_Nil(), list_Nil(), list_Nil(), Flags, Precedence);
+			Result = clause_Create(Parents, list_Nil(), list_Nil(), Justification, Flags, Precedence);
 		else if (i <= clause_LastAntecedentLitIndex(Clause))
-			Result = clause_Create(list_Nil(), Parents, list_Nil(), list_Nil(), Flags, Precedence);
+			Result = clause_Create(list_Nil(), Parents, list_Nil(), Justification, Flags, Precedence);
 		else
-			Result = clause_Create(list_Nil(), list_Nil(), Parents, list_Nil(), Flags, Precedence);
+			Result = clause_Create(list_Nil(), list_Nil(), Parents, Justification, Flags, Precedence);
 
 #else
 

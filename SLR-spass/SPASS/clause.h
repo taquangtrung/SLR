@@ -379,6 +379,11 @@ BOOL clause_HasTermSortConstraintLits(CLAUSE);
 BOOL clause_HasOnlySpecDomArgs(CLAUSE);
 BOOL clause_HasSolvedConstraint(CLAUSE);
 BOOL clause_HasSelectedLiteral(CLAUSE, FLAGSTORE, PRECEDENCE);
+#ifdef _TRUNGTQ_CODE_
+
+BOOL clause_HasJustifiedLiterals(CLAUSE Clause);
+
+#endif
 BOOL clause_IsDeclarationClause(CLAUSE);
 BOOL clause_IsSortTheoryClause(CLAUSE, FLAGSTORE, PRECEDENCE);
 BOOL clause_IsPartOfDefinition(CLAUSE, TERM, int*, LIST);

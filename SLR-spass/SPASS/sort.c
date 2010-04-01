@@ -1644,7 +1644,9 @@ static LIST sort_ApproxHornClauses(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Pr
 
 #ifdef _TRUNGTQ_CODE_
 
-				LIST NewJustification = (LIST)clause_CopyJustification(Clause);
+				LIST NewJustification = list_Nil();
+				if (clause_HasJustifiedLiterals(Clause) == TRUE)
+					NewJustification  = (LIST)clause_CopyJustification(Clause);
 				NewClause = clause_Create(NewConstraint, list_Nil(), NewSuccedent, NewJustification, Flags, Precedence);
 
 #else
@@ -1718,7 +1720,9 @@ LIST sort_ApproxMaxDeclClauses(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Preced
 
 #ifdef _TRUNGTQ_CODE_
 
-			LIST NewJustification = (LIST)clause_CopyJustification(Clause);
+			LIST NewJustification = list_Nil();
+			if (clause_HasJustifiedLiterals(Clause) == TRUE)
+				NewJustification  = (LIST)clause_CopyJustification(Clause);
 			NewClause = clause_Create(NewConstraint, list_Nil(), NewSuccedent, NewJustification, Flags, Precedence);
 
 #else

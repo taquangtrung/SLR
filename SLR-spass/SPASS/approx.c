@@ -148,6 +148,9 @@ static APPROX_TRANSLATION approx_CreateProjectionSymbols(SYMBOL Symbol, PRECEDEN
 
 static LIST approx_ApplyProjection(APPROX_TRANSLATION Translation, CLAUSE Clause, int LitIndex,
 		FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// da fix add justification
+
 /**************************************************************
  INPUT:   An APPROX_TRANSLATION, a clause, a literal index
  within the clause, a flag store and a precedence.
@@ -192,8 +195,13 @@ static LIST approx_ApplyProjection(APPROX_TRANSLATION Translation, CLAUSE Clause
 
 #ifdef _TRUNGTQ_CODE_
 
+		LIST Justification = list_Nil();
+			if (clause_HasJustifiedLiterals(Clause) == TRUE) {
+				Justification  = (LIST)clause_CopyJustification(Clause);
+			}
+
 		/* create the new clause */
-		NewClause = clause_Create(Constraint, Antecedent, Succedent, list_Nil(), Flags, Precedence);
+		NewClause = clause_Create(Constraint, Antecedent, Succedent, Justification, Flags, Precedence);
 
 #else
 
@@ -470,6 +478,9 @@ static LIST approx_MakeTermLinear(TERM Term, NAT Mark)
 }
 
 static CLAUSE approx_MakeClauseLinear(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// da fix add justification
+
 /**************************************************************
  INPUT:   A clause with monadic positive literals, a flag store
  and a precedence
@@ -545,8 +556,13 @@ static CLAUSE approx_MakeClauseLinear(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE
 
 #ifdef _TRUNGTQ_CODE_
 
+	LIST Justification = list_Nil();
+	if (clause_HasJustifiedLiterals(Clause) == TRUE) {
+		Justification  = (LIST)clause_CopyJustification(Clause);
+	}
+
 	/* Create the new clause */
-	NewClause = clause_Create(Constraint, Antecedent, Succedent, list_Nil(), Flags, Precedence);
+	NewClause = clause_Create(Constraint, Antecedent, Succedent, Justification, Flags, Precedence);
 
 #else
 
@@ -617,6 +633,9 @@ static TERM approx_ReplaceSubterms(TERM Term, LIST Duplicates, TERM NewVarTerm)
 
 static LIST approx_ApplyFlattening(CLAUSE Clause, LIST Duplicates, BOOL CheckNegativeLiterals,
 		FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// da fix add justification
+
 /**************************************************************
  INPUT:   A horn clause with one positive literal, a list of terms that
  shall be replaced by some new variable, a boolean flag
@@ -702,8 +721,16 @@ static LIST approx_ApplyFlattening(CLAUSE Clause, LIST Duplicates, BOOL CheckNeg
 
 #ifdef _TRUNGTQ_CODE_
 
-	Clause1 = clause_Create(Constraint1, Antecedent1, Succedent1, list_Nil(), Flags, Precedence);
-	Clause2 = clause_Create(Constraint2, Antecedent2, Succedent2, list_Nil(), Flags, Precedence);
+	// justification nay dc lay tu clause
+	LIST Justification1 = list_Nil();
+	LIST Justification2 = list_Nil();
+	if (clause_HasJustifiedLiterals(Clause) == TRUE) {
+		Justification1  = (LIST)clause_CopyJustification(Clause);
+		Justification2  = (LIST)clause_CopyJustification(Clause);
+	}
+
+	Clause1 = clause_Create(Constraint1, Antecedent1, Succedent1, Justification1, Flags, Precedence);
+	Clause2 = clause_Create(Constraint2, Antecedent2, Succedent2, Justification2, Flags, Precedence);
 
 #else
 
@@ -949,6 +976,9 @@ LIST approx_HornMonadicFlattenHeads(CLAUSE Clause, BOOL CheckVarCondition,
 /**************************************************************/
 
 LIST approx_MakeHorn(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// da fix add justification
+
 /**************************************************************
  INPUT:   A clause, a flag store and a precedence.
  RETURNS: An empty list if <Clause> is already a horn clause,
@@ -982,7 +1012,12 @@ LIST approx_MakeHorn(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Precedence)
 
 #ifdef _TRUNGTQ_CODE_
 
-			NewClause = clause_Create(Constraint, Antecedent, Succedent, list_Nil(), Flags, Precedence);
+			LIST Justification = list_Nil();
+			if (clause_HasJustifiedLiterals(Clause) == TRUE) {
+				Justification  = (LIST)clause_CopyJustification(Clause);
+			}
+
+			NewClause = clause_Create(Constraint, Antecedent, Succedent, Justification, Flags, Precedence);
 
 #else
 

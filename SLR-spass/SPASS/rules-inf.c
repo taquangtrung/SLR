@@ -769,7 +769,7 @@ static CLAUSE inf_ApplyGenSuperposition(CLAUSE Clause, int ci, SUBST Subst, CLAU
 		int pci, SUBST PartnerSubst, TERM SupAtom, BOOL Right, BOOL OrdPara, BOOL MaxPara,
 		FLAGSTORE Flags, PRECEDENCE Precedence)
 
-// SUPERPOSITION => KO can sua justification
+// co SUPERPOSITION => KO can sua justification
 
 /**************************************************************
  INPUT:  Two clauses where a generalized superposition inference can be
@@ -2004,7 +2004,8 @@ LIST inf_MergingParamodulation(CLAUSE GivenClause, SHARED_INDEX ShIndex, FLAGSTO
 static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 		SUBST SubstPartnerTermS, FLAGSTORE Flags, PRECEDENCE Precedence)
 
-// TODO - dang code . CO thay doi Justification, sung dung General Resolution
+// TODO - dang code . CO thay doi Justification, sung dung General Resolution (CHAC CHAN phai sua o day)
+
 /**************************************************************
  INPUT:   A clause to use for Resolution, the index of a
  positive non-equality literal, a unifiable literal,
@@ -2043,7 +2044,22 @@ static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 
 #ifdef _TRUNGTQ_CODE_
 
-	NewClause = clause_CreateBody((clause_Length(GivenClause) - 1) + clause_Length(PartnerClause) - 1, 0);
+	LIST JustificationOfGiven = clause_GetJustifiedLiteralList(GivenClause);
+	LIST JustificationOfPartner = clause_GetJustifiedLiteralList(PartnerClause);
+
+	LIST NewJustification = clause_MergeJustitication(JustificationOfGiven, JustificationOfPartner);
+	int just_length = list_Length(NewJustification);
+
+	NewClause = clause_CreateBody((clause_Length(GivenClause) - 1) + clause_Length(PartnerClause) - 1, just_length);
+
+	// set justification for clause
+	if (list_Empty(NewJustification) == FALSE) {
+		LIST Scan = NewJustification;
+		for (int d = 0; d < just_length; d++) {
+			NewClause->justifiedLiterals[d] = clause_LiteralCreate((TERM) list_Car(Scan), NewClause);
+			Scan = list_Cdr(Scan);
+		}
+	}
 
 #else
 
@@ -3363,6 +3379,9 @@ static void inf_CopyHyperElectron(CLAUSE Clause, SUBST Subst2, SUBST Subst1, int
 
 static CLAUSE inf_BuildHyperResolvent(CLAUSE Nucleus, SUBST Subst, LIST FoundMap,
 		BOOL StrictlyMaximal, FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// TODO - dang fix justification (xem lai RESOLUTION ntn)
+
 /**************************************************************
  INPUT:   A clause <Nucleus> with solved sort constraint,
  the substitution <Subst> for <Nucleus>, a mapping
@@ -3432,8 +3451,13 @@ static CLAUSE inf_BuildHyperResolvent(CLAUSE Nucleus, SUBST Subst, LIST FoundMap
 
 #ifdef _TRUNGTQ_CODE_
 
+	LIST Justification = list_Nil();
+	if (clause_HasJustifiedLiterals(Nucleus) == TRUE) {
+		Justification  = (LIST)clause_CopyJustification(Nucleus);
+	}
+
 	/* create new clause and set clause data */
-	NewClause = clause_Create(Constraint, list_Nil(), Succedent, list_Nil(), Flags, Precedence);
+	NewClause = clause_Create(Constraint, list_Nil(), Succedent, Justification, Flags, Precedence);
 
 #else
 

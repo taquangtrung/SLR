@@ -1715,6 +1715,9 @@ static BOOL red_PropagateDefinitions(CLAUSE Clause, TERM LeadingTerm,
 
 static CLAUSE red_CRwLitTautologyCheck(PROOFSEARCH Search, CLAUSE RedClause,
 		int Except, CLAUSE RuleClause, int i, TERM LeadingTerm, NAT Mode)
+
+// da fix add justification
+
 /**************************************************************
  INPUT:   A proof search object, two clauses, two literal indices
  (one per clause), a mode defining the clause index used
@@ -1762,7 +1765,11 @@ static CLAUSE red_CRwLitTautologyCheck(PROOFSEARCH Search, CLAUSE RedClause,
 
 #ifdef _TRUNGTQ_CODE_
 
-		aux = clause_Create(NegLits, list_Nil(), list_Nil(), list_Nil(), Flags, Precedence);
+		LIST NewJustification = list_Nil();
+		if (clause_HasJustifiedLiterals(RedClause) == TRUE)
+			NewJustification = clause_CopyJustification(RedClause);
+
+		aux = clause_Create(NegLits, list_Nil(), list_Nil(), NewJustification, Flags, Precedence);
 
 #else
 
@@ -4287,7 +4294,9 @@ BOOL red_ClauseDeletion(SORTTHEORY Theory, CLAUSE RedClause, FLAGSTORE Flags,
 
 #ifdef _TRUNGTQ_CODE_
 
-		LIST NewJustification = clause_CopyJustification(RedClause);
+		LIST NewJustification = list_Nil();
+		if (clause_HasJustifiedLiterals(RedClause) == TRUE)
+			NewJustification = clause_CopyJustification(RedClause);
 		ConstraintClause = clause_Create(Scan, list_Nil(), list_Nil(), NewJustification, Flags, Precedence);
 
 #else

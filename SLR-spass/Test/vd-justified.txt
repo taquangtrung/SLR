@@ -8,7 +8,7 @@ description({* Sokrates is human and since all humans are mortal, he is mortal t
 end_of_list.
 
 list_of_symbols.
-  functions[(sokrates,0), (alibaba,0), (aladanh, 0)].
+  functions[(sokrates,0), (alibaba,0), (aladanh, 0), (tazan, 0)].
   predicates[(Human,1),(Mortal,1)].
 end_of_list.
 

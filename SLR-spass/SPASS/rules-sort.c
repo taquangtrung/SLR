@@ -142,6 +142,9 @@ static LIST inf_GetSortResolutionPartnerLits(TERM Atom, st_INDEX Index)
 
 static CLAUSE inf_BuildConstraintHyperResolvent(CLAUSE Clause, LIST Lits, SUBST Subst,
 		LIST Foundlits, FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// TODO - dang fix justification (xem lai RESOLUTION ntn)
+
 /**************************************************************
  INPUT:   A <Clause> where the sort constraint is resolved,
  a list <Lits> of constraint indices in <Clause> where
@@ -219,8 +222,12 @@ static CLAUSE inf_BuildConstraintHyperResolvent(CLAUSE Clause, LIST Lits, SUBST 
 
 #ifdef _TRUNGTQ_CODE_
 
-			//TODO - dang code : thay justification tai day
-			NewClause = clause_CreateUnnormalized(Constraint, Antecedent, Succedent, list_Nil());
+			LIST Justification = list_Nil();
+			if (clause_HasJustifiedLiterals(Clause) == TRUE) {
+				Justification  = (LIST)clause_CopyJustification(Clause);
+			}
+
+			NewClause = clause_CreateUnnormalized(Constraint, Antecedent, Succedent, Justification);
 
 #else
 
@@ -308,7 +315,12 @@ static CLAUSE inf_BuildConstraintHyperResolvent(CLAUSE Clause, LIST Lits, SUBST 
 
 #ifdef _TRUNGTQ_CODE_
 
-	NewClause = clause_Create(Constraint, Antecedent, Succedent, list_Nil(), Flags, Precedence);
+	LIST Justification1 = list_Nil();
+	if (clause_HasJustifiedLiterals(Clause) == TRUE) {
+		Justification1  = (LIST)clause_CopyJustification(Clause);
+	}
+
+	NewClause = clause_Create(Constraint, Antecedent, Succedent, Justification1, Flags, Precedence);
 
 #else
 
@@ -1010,6 +1022,9 @@ static SORT inf_GetSortFromLits(LIST Literals, SORTTHEORY SortTheory)
 
 static LIST inf_ApplyWeakening(CLAUSE Clause, LIST TLits, LIST Partners, CONDITION Condition,
 		FLAGSTORE Flags, PRECEDENCE Precedence)
+
+// da fix add justification
+
 /**************************************************************
  INPUT:   A clause, a list of constraint indices in <Clause>,
  a list of maximal, monadic succedent literals,
@@ -1141,7 +1156,13 @@ static LIST inf_ApplyWeakening(CLAUSE Clause, LIST TLits, LIST Partners, CONDITI
 #ifdef _TRUNGTQ_CODE_
 
 	/* Now we've got all data we need */
-	newClause = clause_Create(constraint, antecedent, succedent, list_Nil(), Flags, Precedence);
+
+	LIST Justification = list_Nil();
+	if (clause_HasJustifiedLiterals(Clause) == TRUE) {
+		Justification  = (LIST)clause_CopyJustification(Clause);
+	}
+
+	newClause = clause_Create(constraint, antecedent, succedent, Justification, Flags, Precedence);
 
 #else
 
