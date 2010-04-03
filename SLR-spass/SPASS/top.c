@@ -1524,6 +1524,51 @@ int main(int argc, const char* argv[]) {
 			&Axioms, &Conjectures, &Sorts, &UserPrecedence, &UserSelection,
 			&ClAxRelation, &NativeClauseInput);
 
+#ifdef _TRUNGTQ_CODE_
+
+	// Print LABEL & TERM of a FORMULAE
+	printf("==========++++++++++++++++++============\n");
+	for (Scan = Axioms; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
+			char* formulae_label = (char*) list_PairFirst((LIST) list_Car(Scan));
+			char* mark_string = "Justification";
+			printf("Label: %s -", formulae_label);
+			printf("\n");
+
+
+
+			if (strncmp(formulae_label, mark_string, strlen(mark_string)) == 0) {
+
+				TERM ConTerm = (TERM) list_PairSecond((LIST) list_Car(Scan));
+				printf("    Full term: ");
+				term_Print(ConTerm);
+				printf("\n");
+
+				// tach va thay the label
+				list_Rplaca((LIST) list_Car(Scan), "remove_justified_literals");
+
+				/*
+				 * Tach va thay the term
+				 */
+				// tach term
+				TERM origin_Term = (TERM)term_FirstArgument(ConTerm);
+				// lay justification
+				LIST justified_term_list = (LIST)term_ArgumentList((TERM)term_SecondArgument(ConTerm));
+				// ghep justification vao term
+				term_RplacJustificationList(origin_Term, justified_term_list);
+				// thay the term thu dc vao list
+				list_Rplacd((LIST) list_Car(Scan), origin_Term);
+
+				printf("    Edited term: ");
+				term_Print(ConTerm);
+				printf("\n");
+
+
+			}
+	}
+
+#endif
+
+
 	for (Scan = UserSelection; !list_Empty(Scan); Scan = list_Cdr(Scan))
 		symbol_AddProperty((SYMBOL) list_Car(Scan), SELECTED);
 

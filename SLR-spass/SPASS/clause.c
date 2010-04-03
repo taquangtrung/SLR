@@ -449,17 +449,17 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 
 		for (LIST scan = JustList1; !list_Empty(scan); scan = list_Cdr(scan))
 		{
-			TERM atom = term_Copy(list_Car(scan));
+			TERM atom = list_Car(scan);
 			list = list_Cons(atom, list);
 		}
 
 		for (LIST scan2 = JustList2; !list_Empty(scan2); scan2 = list_Cdr(scan2))
 		{
-			TERM atom2 = term_Copy(list_Car(scan2));
+			TERM atom2 = list_Car(scan2);
 			BOOL isConcisive = FALSE;
 
 			for (LIST scan1 = JustList1; !list_Empty(scan1); scan1 = list_Cdr(scan1)) {
-				TERM atom1 = term_Copy(list_Car(scan1));
+				TERM atom1 = list_Car(scan1);
 				// chi can so sanh 2 term theo symbol
 				if (term_CompareBySymbolOccurences(atom1, atom2) == 0) {
 					isConcisive = TRUE;
@@ -2591,7 +2591,7 @@ void clause_Init(void)
 		Result->c = 0;
 		Result->a = 0;
 		Result->s = 0;
-		Result->j = 0;
+		Result->j = JustificationLength;
 
 		if (ClauseLength != 0)
 			Result->literals = (LITERAL *) memory_Malloc((ClauseLength)
@@ -3257,7 +3257,7 @@ void clause_Delete(CLAUSE Clause)
 	int m = clause_NumOfJustifiedLits(Clause);
 
 	for (int d = 0; d < m; d++)
-		clause_LiteralDelete(clause_GetJustifiedLiteral(Clause, d));
+		clause_LiteralFree(clause_GetJustifiedLiteral(Clause, d));
 
 #endif
 

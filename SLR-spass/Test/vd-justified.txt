@@ -14,15 +14,15 @@ end_of_list.
 
 list_of_formulae(axioms).
 
-formula(implies(Human(sokrates), or(Human(alibaba), Mortal(aladanh))), Justification_1).
 formula(Human(sokrates), 2).
+formula(implies(Human(sokrates), or(Human(alibaba), Mortal(aladanh))), Justification_1).
 formula(forall([x],implies(Human(x),Mortal(x))),3).
 
 end_of_list.
 
 list_of_formulae(conjectures).
 
-formula(Mortal(sokrates),3).
+formula(Mortal(sokrates),4).
 
 end_of_list.
 

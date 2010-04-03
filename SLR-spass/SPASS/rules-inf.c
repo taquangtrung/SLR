@@ -2022,6 +2022,14 @@ static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 	PartnerClause = clause_LiteralOwningClause(NegLit);
 	GivenClause = clause_LiteralOwningClause(PosLit);
 
+#ifdef _TRUNGTQ_CODE_
+
+	printf("============Resolution:\n");
+	printf("   GivenClause: "); clause_Print(GivenClause); printf("\n");
+	printf("   PartnerClause: "); clause_Print(PartnerClause); printf("\n");
+
+#endif
+
 	pls = clause_LastSuccedentLitIndex(PartnerClause);
 	pla = clause_LastAntecedentLitIndex(PartnerClause);
 	plc = clause_LastConstraintLitIndex(PartnerClause);
@@ -2047,18 +2055,20 @@ static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 	LIST JustificationOfGiven = clause_GetJustifiedLiteralList(GivenClause);
 	LIST JustificationOfPartner = clause_GetJustifiedLiteralList(PartnerClause);
 
+	int length1 = list_Length(JustificationOfGiven);
+	int length2 = list_Length(JustificationOfPartner);
+
+	printf("Length 1: %d - Length 2: %d", length1, length2); printf("\n");
+
 	LIST NewJustification = clause_MergeJustitication(JustificationOfGiven, JustificationOfPartner);
 	int just_length = list_Length(NewJustification);
 
 	NewClause = clause_CreateBody((clause_Length(GivenClause) - 1) + clause_Length(PartnerClause) - 1, just_length);
 
 	// set justification for clause
-	if (list_Empty(NewJustification) == FALSE) {
-		LIST Scan = NewJustification;
-		for (int d = 0; d < just_length; d++) {
-			NewClause->justifiedLiterals[d] = clause_LiteralCreate((TERM) list_Car(Scan), NewClause);
-			Scan = list_Cdr(Scan);
-		}
+	if (!list_Empty(NewJustification)) {
+		clause_SetJustifiedLiterals(NewClause, NewJustification);
+
 	}
 
 #else
@@ -2148,6 +2158,12 @@ static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 
 	clause_SetDataFromParents(NewClause, PartnerClause, pi, GivenClause, i, Flags, Precedence);
 	clause_SetFromGeneralResolution(NewClause);
+
+#ifdef _TRUNGTQ_CODE_
+
+	printf("   ResultClause: "); clause_Print(NewClause); printf("\n");
+
+#endif
 
 	return (NewClause);
 }

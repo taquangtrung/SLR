@@ -3822,7 +3822,42 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 	Count = 0;
 	for (Scan = AllFormulae; !list_Empty(Scan); Scan = list_Cdr(Scan), Count++) {
 		LIST FormulaClausesTemp;
+
+//#ifdef _TRUNGTQ_CODE_
+//	/*
+//	 * Doc cac input clause, tach cac clause co justification va chuan hoa lai:
+//	 * khoi phuc clause goc + phan justification
+//	 */
+//		/*
+//		 * Tach lay cac term trong clause goc va cac justified literals
+//		 */
+//		LIST Pair = list_Car(Scan);
+//		TERM tempTerm = (TERM) list_PairSecond(Pair);
+//		char* formulaeLabel = (char*) list_PairFirst(Pair);
+//		char* markString = "Justification";
+//		LIST justifiedTermList = list_Nil();		// list justified literals
+//		TERM originTerm = NULL;			// origin term
+//		if (strncmp(formulaeLabel, markString, strlen(markString)) == 0) {
+//			// tach va thay the origin clause
+//			originTerm = (TERM)term_FirstArgument(term_FirstArgument(tempTerm));
+////			list_Rplacd(Pair, (LIST)originTerm);
+//			// tach va thay the label
+//			justifiedTermList = (LIST)term_ArgumentList((TERM)term_SecondArgument(tempTerm));
+////			list_Rplaca(Pair, "remove_justified_literals");
+//			// gan lai formula
+//			Formula = term_Copy(originTerm);
+//		}
+//		else
+//			Formula = term_Copy(tempTerm);
+//#else
+
 		Formula = term_Copy((TERM) list_PairSecond(list_Car(Scan)));
+
+
+//#endif
+
+
+
 #ifdef CHECK_CNF
 		fputs("\nInputFormula : ",stdout); term_Print(Formula);
 		printf("\nLabel : %s\n", (char*) list_PairFirst(list_Car(Scan)));
@@ -3832,6 +3867,31 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 		Formula = cnf_DistributiveFormula(Formula);
 		FormulaClausesTemp = cnf_MakeClauseList(Formula, FALSE, FALSE, Flags,
 				Precedence);
+
+//#ifdef _TRUNGTQ_CODE_
+//		/*
+//		 * Neu clause co jutified literal thi ghep vao cac clause
+//		 */
+//		if (justifiedTermList != list_Nil()) {
+//
+//			LIST clauseList;
+//			for (clauseList = FormulaClausesTemp; !list_Empty(clauseList); clauseList = list_Cdr(clauseList)) {
+//				CLAUSE tempClause = (CLAUSE)list_Car(clauseList);
+//
+//				LIST justifiedLiteralList = list_Nil();
+//				LIST termList;
+//				for (termList = justifiedTermList; !list_Empty(termList); termList = list_Cdr(termList)) {
+//					TERM tempTerm = (TERM)list_Car(termList);
+//					LITERAL tempLiteral = clause_LiteralCreate(tempTerm, tempClause);
+//					justifiedLiteralList = list_Cons(tempLiteral, justifiedLiteralList);
+//				}
+//
+//				// bo sung justified literals vao clause
+//				clause_SetJustifiedLiterals(tempClause, justifiedLiteralList);
+//			}
+//		}
+//#endif
+
 		if (flag_GetFlagValue(Flags, flag_DOCPROOF) || flag_GetFlagValue(Flags,
 				flag_FLOTTER)) {
 			for (Scan2 = FormulaClausesTemp; !list_Empty(Scan2); Scan2
@@ -3843,6 +3903,10 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 		FormulaClauses = list_Nconc(FormulaClauses, FormulaClausesTemp);
 		term_Delete(Formula);
 	}
+
+
+
+
 
 	/* Trage nun Formula Clauses modulo Reduktion in einen Index ein */
 
@@ -3872,85 +3936,32 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 	/*cnf_CheckClauseListsConsistency(ShIndex); */
 #endif
 
-//	/*
-//	 * Duyet tat ca cac clause va tim justification, roi sau day chinh sua cac clause
-//	 */
-//#ifdef _TRUNGTQ_CODE_
-//	printf("=============+++++++++++++++===============\n");
-//	printf("Raw input clauses:\n");
-//	for (Scan = AllFormulae; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
-//		// print LABEL & TERM of a FORMULAE
-//		LIST currentFormulae = (LIST)list_Car(Scan);
-//		char* tempLabel = (char*) list_PairFirst(currentFormulae);
-//		printf("Label: %s - Term: ", tempLabel);
-//		TERM tempTerm = (TERM) list_PairSecond(currentFormulae);
-//		term_Print(tempTerm);
-//
-////		LIST termList = term_ArgumentList(tempTerm);
-////		LIST tempScan;
-////		for (tempScan = termList; !list_Empty(tempScan); tempScan = list_Cdr(tempScan)) {
-////			TERM tempTerm1 = list_Car(tempScan);
-////			printf("----");
-////			term_Print(tempTerm1);
-////		}
-////		term_Print(tempTerm2);
-//		printf("\n");
-//
-//		// Tach lay LABEL cua FORMULAE hien tai
-//		BOOL hasJustification = FALSE;
-//		char* formulaeLabel = (char*) list_PairFirst((LIST) list_Car(Scan));
-//		char* markString = "Justification";
-//		if (strncmp(formulaeLabel, markString, strlen(markString)) == 0) {
-//			printf("======> Co justification:\n");
-//			// va ghep vao clause
-//			TERM originTerm = (TERM)term_FirstArgument(term_FirstArgument(tempTerm));
-//			LIST justifiedTermList = (LIST)term_ArgumentList((TERM)term_SecondArgument(tempTerm));
-//			printf("      Origin term: ");
-//			term_Print(originTerm);
-//			// replace formulae
-//			list_Rplacd(currentFormulae, (LIST)originTerm);
-//			list_Rplaca(currentFormulae, "remove_justified_literals");
-//			printf("\n");
-//			printf("      Justified term list: ");
-//			LIST tempScan;
-//			for (tempScan = justifiedTermList; !list_Empty(tempScan); tempScan = list_Cdr(tempScan)) {
-//				TERM term1 = list_Car(tempScan);
-//				term_Print(term1);
-//				printf(" -- ");
-//			}
-//			printf("\n");
-//
-//		}
-//	}
-//#endif
-
-
 	*Symblist = list_Nil();
 	for (Scan = AllFormulae; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
 		LIST Ax, Pair;
 		UsedTerms = list_Nil();
 		Pair = list_Car(Scan);
 
-#ifdef _TRUNGTQ_CODE_
-		/*
-		 * Tach lay cac term trong clause goc va cac justified literals
-		 */
-		char* tempLabel = (char*) list_PairFirst(Pair);
-		TERM tempTerm = (TERM) list_PairSecond(Pair);
-
-		char* formulaeLabel = (char*) list_PairFirst((LIST) list_Car(Scan));
-		char* markString = "Justification";
-		LIST justifiedTermList = NULL;		// list justified literals
-		TERM originTerm = NULL;			// origin term
-		if (strncmp(formulaeLabel, markString, strlen(markString)) == 0) {
-			// tach va thay the origin clause
-			originTerm = (TERM)term_FirstArgument(term_FirstArgument(tempTerm));
-			list_Rplacd(Pair, (LIST)originTerm);
-			// tach va thay the label
-			justifiedTermList = (LIST)term_ArgumentList((TERM)term_SecondArgument(tempTerm));
-			list_Rplaca(Pair, "remove_justified_literals");
-		}
-#endif
+//#ifdef _TRUNGTQ_CODE_
+//	/*
+//	* Tach lay cac term trong clause goc va cac justified literals
+//	*/
+//	char* tempLabel = (char*) list_PairFirst(Pair);
+//	TERM tempTerm = (TERM) list_PairSecond(Pair);
+//
+//	char* formulaeLabel = (char*) list_PairFirst((LIST) list_Car(Scan));
+//	char* markString = "Justification";
+//	LIST justifiedTermList = NULL; // list justified literals
+//	TERM originTerm = NULL; // origin term
+//	if (strncmp(formulaeLabel, markString, strlen(markString)) == 0) {
+//		// tach va thay the origin clause
+//		originTerm = (TERM)term_FirstArgument(term_FirstArgument(tempTerm));
+//		list_Rplacd(Pair, (LIST)originTerm);
+//		// tach va thay the label
+//		justifiedTermList = (LIST)term_ArgumentList((TERM)term_SecondArgument(tempTerm));
+//		list_Rplaca(Pair, "remove_justified_literals");
+//	}
+//#endif
 
 #ifdef CHECK_CNF
 		fputs("\nFormula : ", stdout);
@@ -3962,29 +3973,37 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 				Pair), &UsedTerms, Symblist, Result, FALSE,
 				InputClauseToTermLabellist);
 
-#ifdef _TRUNGTQ_CODE_
-		/*
-		 * Neu clause co jutified literal thi ghep vao cac clause
-		 */
-		if (justifiedTermList != NULL) {
-			LIST clauseList;
-			for (clauseList = Ax; !list_Empty(clauseList); clauseList = list_Cdr(clauseList)) {
-				CLAUSE tempClause = (CLAUSE)list_Car(clauseList);
 
-				// tinh justified literals
-				LIST justifiedLiteralList = NULL;
-				LIST termList;
-				for (termList = justifiedTermList; !list_Empty(termList); termList = list_Cdr(termList)) {
-					TERM tempTerm = (TERM)list_Car(termList);
-					LITERAL tempLiteral = clause_LiteralCreate(tempTerm, tempClause);
-					justifiedLiteralList = list_Cons(tempLiteral, justifiedLiteralList);
-				}
+//#ifdef _TRUNGTQ_CODE_
+//		/*
+//		* Neu clause co jutified literal thi ghep vao cac clause
+//		*/
+//		if (justifiedTermList != NULL) {
+//			LIST clauseList;
+//			for (clauseList = Ax; !list_Empty(clauseList); clauseList = list_Cdr(clauseList)) {
+//				CLAUSE tempClause = (CLAUSE)list_Car(clauseList);
+//
+//				// tinh justified literals
+//				LIST justifiedLiteralList = NULL;
+//				LIST termList;
+//				for (termList = justifiedTermList; !list_Empty(termList); termList = list_Cdr(termList)) {
+//					TERM tempTerm = (TERM)list_Car(termList);
+//					LITERAL tempLiteral = clause_LiteralCreate(tempTerm, tempClause);
+//					justifiedLiteralList = list_Cons(tempLiteral, justifiedLiteralList);
+//				}
+//
+//				// bo sung justified literals vao clause
+//				clause_SetJustifiedLiterals(tempClause, justifiedLiteralList);
+//			}
+//		}
+//#endif
 
-				// bo sung justified literals vao clause
-				clause_SetJustifiedLiterals(tempClause, justifiedLiteralList);
-			}
-		}
-#endif
+//		printf("************************************************************************************************\n");
+//		for (LIST list = Ax; !list_Empty(list); list = list_Cdr(list)) {
+//			CLAUSE newClause = list_Car(list);
+//			clause_Print(newClause);
+//			printf("\n");
+//		}
 
 		/* Set CONCLAUSE flag for clauses derived from conjectures */
 		if (list_PointerMember(ConjectureList, list_PairSecond(Pair))) {
