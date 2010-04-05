@@ -1623,6 +1623,8 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 			clause_DeleteLiterals(list_Car(scan), condlist, Flags, Precedence);
 		list_Delete(condlist);
 	}
+
+	// TTQ_COMMENT . subsumption clause list
 	clauselist = cnf_SubsumeClauseList(clauselist);
 	newclauselist = list_Nil();
 	while (!list_Empty(clauselist)) {
@@ -3823,40 +3825,15 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 	for (Scan = AllFormulae; !list_Empty(Scan); Scan = list_Cdr(Scan), Count++) {
 		LIST FormulaClausesTemp;
 
-//#ifdef _TRUNGTQ_CODE_
-//	/*
-//	 * Doc cac input clause, tach cac clause co justification va chuan hoa lai:
-//	 * khoi phuc clause goc + phan justification
-//	 */
-//		/*
-//		 * Tach lay cac term trong clause goc va cac justified literals
-//		 */
-//		LIST Pair = list_Car(Scan);
-//		TERM tempTerm = (TERM) list_PairSecond(Pair);
-//		char* formulaeLabel = (char*) list_PairFirst(Pair);
-//		char* markString = "Justification";
-//		LIST justifiedTermList = list_Nil();		// list justified literals
-//		TERM originTerm = NULL;			// origin term
-//		if (strncmp(formulaeLabel, markString, strlen(markString)) == 0) {
-//			// tach va thay the origin clause
-//			originTerm = (TERM)term_FirstArgument(term_FirstArgument(tempTerm));
-////			list_Rplacd(Pair, (LIST)originTerm);
-//			// tach va thay the label
-//			justifiedTermList = (LIST)term_ArgumentList((TERM)term_SecondArgument(tempTerm));
-////			list_Rplaca(Pair, "remove_justified_literals");
-//			// gan lai formula
-//			Formula = term_Copy(originTerm);
-//		}
-//		else
-//			Formula = term_Copy(tempTerm);
-//#else
-
 		Formula = term_Copy((TERM) list_PairSecond(list_Car(Scan)));
 
+#ifdef _TRUNGTQ_CODE_
 
-//#endif
+		printf(" ====== FORMULAE from copy: ");
+		term_Print(Formula);
+		printf(" \n");
 
-
+#endif
 
 #ifdef CHECK_CNF
 		fputs("\nInputFormula : ",stdout); term_Print(Formula);
@@ -3864,7 +3841,25 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 #endif
 		Formula = cnf_SkolemFormula(Formula, Flags, Precedence,
 				&SkolemFunctions);
+
+#ifdef _TRUNGTQ_CODE_
+
+		printf(" ====== FORMULAE created 1: ");
+		term_Print(Formula);
+		printf(" \n");
+
+#endif
+
 		Formula = cnf_DistributiveFormula(Formula);
+
+#ifdef _TRUNGTQ_CODE_
+
+		printf(" ====== FORMULAE created 2: ");
+		term_Print(Formula);
+		printf(" \n");
+
+#endif
+
 		FormulaClausesTemp = cnf_MakeClauseList(Formula, FALSE, FALSE, Flags,
 				Precedence);
 

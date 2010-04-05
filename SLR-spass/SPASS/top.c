@@ -1529,43 +1529,58 @@ int main(int argc, const char* argv[]) {
 	// Print LABEL & TERM of a FORMULAE
 	printf("==========++++++++++++++++++============\n");
 	for (Scan = Axioms; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
-			char* formulae_label = (char*) list_PairFirst((LIST) list_Car(Scan));
+			LIST current_Axiom = (LIST)list_Car(Scan);
+
+			char* formulae_label = (char*) list_PairFirst(current_Axiom);
 			char* mark_string = "Justification";
 			printf("Label: %s -", formulae_label);
 			printf("\n");
 
-
+			TERM current_Term = (TERM) list_PairSecond(current_Axiom);
+			printf("    Full term: ");
+			term_Print(current_Term);
+			printf("\n");
 
 			if (strncmp(formulae_label, mark_string, strlen(mark_string)) == 0) {
-
-				TERM ConTerm = (TERM) list_PairSecond((LIST) list_Car(Scan));
-				printf("    Full term: ");
-				term_Print(ConTerm);
-				printf("\n");
-
-				// tach va thay the label
-				list_Rplaca((LIST) list_Car(Scan), "remove_justified_literals");
-
 				/*
 				 * Tach va thay the term
 				 */
 				// tach term
-				TERM origin_Term = (TERM)term_FirstArgument(ConTerm);
+				TERM origin_Term = term_Copy((TERM)term_FirstArgument(current_Term));
+
 				// lay justification
-				LIST justified_term_list = (LIST)term_ArgumentList((TERM)term_SecondArgument(ConTerm));
+				LIST justified_Term_List = list_Copy((LIST)term_ArgumentList((TERM)term_SecondArgument(current_Term)));
+
 				// ghep justification vao term
-				term_RplacJustificationList(origin_Term, justified_term_list);
+				term_RplacJustificationList(origin_Term, justified_Term_List);
+
 				// thay the term thu dc vao list
-				list_Rplacd((LIST) list_Car(Scan), origin_Term);
+				list_Rplacd((LIST)list_Car(Scan), (LIST)origin_Term);
+				// tach va thay the label
+				list_Rplaca((LIST)list_Car(Scan), "remove_justified_literals");
+
+				current_Term = (TERM) list_PairSecond(current_Axiom);
 
 				printf("    Edited term: ");
-				term_Print(ConTerm);
+				term_Print(current_Term);
 				printf("\n");
-
-
 			}
 	}
 
+
+	// Print Axiom
+		printf("==========++++Axiom+++++============\n");
+		for (Scan = Axioms; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
+				LIST current_Axiom = (LIST)list_Car(Scan);
+
+
+
+				TERM current_Term = (TERM) list_PairSecond(current_Axiom);
+				printf("    Full term: ");
+				term_Print(current_Term);
+				printf("\n");
+
+		}
 #endif
 
 
