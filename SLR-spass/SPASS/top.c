@@ -1549,20 +1549,31 @@ int main(int argc, const char* argv[]) {
 				TERM origin_Term = term_Copy((TERM)term_FirstArgument(current_Term));
 
 				// lay justification
-				LIST justified_Term_List = list_Copy((LIST)term_ArgumentList((TERM)term_SecondArgument(current_Term)));
+				LIST new_justification = list_Nil();
+
+				LIST old_justification = (LIST)term_ArgumentList((TERM)term_SecondArgument(current_Term));
+				for (LIST new_scan = old_justification; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+					TERM justification = list_Car(new_scan);
+					printf(" -- just: ");
+					term_Print(justification);
+					printf("\n");
+					new_justification = list_Cons(term_Copy(justification), new_justification);
+				}
 
 				// ghep justification vao term
-				term_RplacJustificationList(origin_Term, justified_Term_List);
+				term_RplacJustificationList(origin_Term, new_justification);
+
+				term_Delete(current_Term);
 
 				// thay the term thu dc vao list
-				list_Rplacd((LIST)list_Car(Scan), (LIST)origin_Term);
+				list_Rplacd(current_Axiom, (LIST)origin_Term);
 				// tach va thay the label
-				list_Rplaca((LIST)list_Car(Scan), "remove_justified_literals");
+				list_Rplaca(current_Axiom, "remove_justified_literals");
 
 				current_Term = (TERM) list_PairSecond(current_Axiom);
 
 				printf("    Edited term: ");
-				term_Print(current_Term);
+				term_Print(origin_Term);
 				printf("\n");
 			}
 	}
@@ -1663,19 +1674,6 @@ int main(int argc, const char* argv[]) {
 
 		/* Create labels for formulae without them */
 		for (Scan = Axioms; !list_Empty(Scan); Scan = list_Cdr(Scan), Termcount++) {
-//#ifdef _TRUNGTQ_CODE_
-//
-//			char* s = list_PairFirst(list_Cdr(list_Car(Scan)));
-//			char str[20];
-//			int i = 0;
-//			while (*s != 0) {
-//				str[i] = *s;
-//				s = s +1;
-//				i++;
-//			}
-//			str[i+1] == 0;
-//
-//#endif
 
 			if (list_PairFirst(list_Car(Scan)) == NULL) {
 				char L[100];

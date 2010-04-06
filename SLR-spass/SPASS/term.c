@@ -158,30 +158,20 @@ void term_Delete(TERM Term)
 	if (term_IsComplex(Term)) {
 		LIST Scan;
 
-		printf(" -- delete Term: ");
-		term_Print(Term);
-		printf("\n");
-
 		for (Scan = term_ArgumentList(Term); list_Exist(Scan); Scan = list_Cdr(Scan)) {
-			printf("       + delete argument: ");
-			term_Print(list_Car(Scan));
-			printf("\n");
 			term_Delete(list_Car(Scan));
 		}
-		printf("          -> finish delete argument list \n");
 		list_Delete(term_ArgumentList(Term));
 
 #ifdef _TRUNGTQ_CODE_
 
 		// delete justification
-		for	(Scan = term_JustificationList(Term); list_Exist(Scan); Scan = list_Cdr(Scan)) {
-			printf("       + delete justification: ");
-			term_Print(list_Car(Scan));
-			printf("\n");
-			term_Delete(list_Car(Scan));
+		if (term_HasJustification(Term)) {
+			for	(Scan = term_JustificationList(Term); list_Exist(Scan); Scan = list_Cdr(Scan)) {
+				term_Delete(list_Car(Scan));
+			}
+			list_Delete(term_JustificationList(Term));
 		}
-		list_Delete(term_JustificationList(Term));
-
 
 #endif
 

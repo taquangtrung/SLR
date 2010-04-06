@@ -1337,12 +1337,34 @@ static TERM cnf_DistributiveFormula(TERM Formula)
 	TERM Result;
 	LIST Scan, Lists;
 
+#ifdef _TRUNGTQ_CODE_
+	LIST JustificationList = list_Nil();
+	if (term_HasJustification(Formula)) {
+		// luu tru justification list cua term cu~
+		JustificationList = term_JustificationList(Formula);
+		// thay the justification cua clause sap bi xoa
+		term_RplacJustificationList(Formula, list_Nil());
+	}
+
+#endif
+
+
 	Lists = cnf_ComputeLiteralLists(Formula);
 
 	for (Scan = Lists; !list_Empty(Scan); Scan = list_Cdr(Scan))
 		list_Rplaca(Scan, term_Create(fol_Or(), list_Car(Scan)));
 
 	Result = term_Create(fol_And(), Lists);
+
+#ifdef _TRUNGTQ_CODE_
+
+	if (!list_Empty(JustificationList)) {
+		// chuyen justification cua term sap bi xoa vao term moi
+		term_RplacJustificationList(Result, JustificationList);
+	}
+
+#endif
+
 	term_Delete(Formula);
 
 	return Result;
@@ -1573,7 +1595,9 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 	}
 
 	delclauselist = list_Nil();
+
 	term = cnf_MakeOneAndTerm(term);
+
 	if (symbol_Equal(term_TopSymbol(term), fol_And())) {
 		for (scan = term_ArgumentList(term); !list_Empty(scan); scan
 				= list_Cdr(scan)) {
@@ -1581,10 +1605,22 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 			termlist = list_Nil();
 			if (!(symbol_IsPredicate(term_TopSymbol(list_Car(scan)))
 					|| fol_IsNegativeLiteral(list_Car(scan)))) {
+
+				// FIXME: bo sung justification o ham term_CopyTermList
 				termlist = term_CopyTermList(term_ArgumentList(list_Car(scan)));
 				termlist = term_DestroyDuplicatesInList(termlist);
 			} else
 				termlist = list_List(term_Copy(list_Car(scan)));
+
+#ifdef _TRUNGTQ_CODE_
+			for (LIST new_scan = termlist; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+				printf("============TERM of TERMLIST : ");
+				term_Print(list_Car(new_scan));
+				printf("\n");
+
+			}
+
+#endif
 
 			if (!list_Empty(termlist)) {
 				clause = clause_CreateFromLiterals(termlist, Sorts, Conclause,
@@ -1601,6 +1637,7 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 		term = cnf_MakeOneOrTerm(term);
 		if (!(symbol_IsPredicate(term_TopSymbol(term))
 				|| fol_IsNegativeLiteral(term))) {
+			// FIXME: bo sung justification o ham term_CopyTermList
 			termlist = term_CopyTermList(term_ArgumentList(term));
 			termlist = term_DestroyDuplicatesInList(termlist);
 		} else
@@ -3827,65 +3864,34 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 
 		Formula = term_Copy((TERM) list_PairSecond(list_Car(Scan)));
 
-#ifdef _TRUNGTQ_CODE_
-
-		printf(" ====== FORMULAE from copy: ");
-		term_Print(Formula);
-		printf(" \n");
-
-#endif
-
 #ifdef CHECK_CNF
 		fputs("\nInputFormula : ",stdout); term_Print(Formula);
 		printf("\nLabel : %s\n", (char*) list_PairFirst(list_Car(Scan)));
 #endif
 		Formula = cnf_SkolemFormula(Formula, Flags, Precedence,
 				&SkolemFunctions);
-
-#ifdef _TRUNGTQ_CODE_
-
-		printf(" ====== FORMULAE created 1: ");
-		term_Print(Formula);
-		printf(" \n");
-
-#endif
-
 		Formula = cnf_DistributiveFormula(Formula);
 
 #ifdef _TRUNGTQ_CODE_
 
-		printf(" ====== FORMULAE created 2: ");
+		printf("============Formula: ");
 		term_Print(Formula);
-		printf(" \n");
+		printf("\n");
 
 #endif
 
 		FormulaClausesTemp = cnf_MakeClauseList(Formula, FALSE, FALSE, Flags,
 				Precedence);
 
-//#ifdef _TRUNGTQ_CODE_
-//		/*
-//		 * Neu clause co jutified literal thi ghep vao cac clause
-//		 */
-//		if (justifiedTermList != list_Nil()) {
-//
-//			LIST clauseList;
-//			for (clauseList = FormulaClausesTemp; !list_Empty(clauseList); clauseList = list_Cdr(clauseList)) {
-//				CLAUSE tempClause = (CLAUSE)list_Car(clauseList);
-//
-//				LIST justifiedLiteralList = list_Nil();
-//				LIST termList;
-//				for (termList = justifiedTermList; !list_Empty(termList); termList = list_Cdr(termList)) {
-//					TERM tempTerm = (TERM)list_Car(termList);
-//					LITERAL tempLiteral = clause_LiteralCreate(tempTerm, tempClause);
-//					justifiedLiteralList = list_Cons(tempLiteral, justifiedLiteralList);
-//				}
-//
-//				// bo sung justified literals vao clause
-//				clause_SetJustifiedLiterals(tempClause, justifiedLiteralList);
-//			}
-//		}
-//#endif
+#ifdef _TRUNGTQ_CODE_
+
+		for (LIST new_scan = FormulaClausesTemp; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+			printf("============Clause created 1: ");
+			clause_Print(list_Car(new_scan));
+			printf("\n");
+		}
+
+#endif
 
 		if (flag_GetFlagValue(Flags, flag_DOCPROOF) || flag_GetFlagValue(Flags,
 				flag_FLOTTER)) {
@@ -3899,15 +3905,21 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 		term_Delete(Formula);
 	}
 
-
-
-
-
 	/* Trage nun Formula Clauses modulo Reduktion in einen Index ein */
 
 	/* red_SatUnit works only on conclauses */
-	for (Scan = FormulaClauses; !list_Empty(Scan); Scan = list_Cdr(Scan))
+	for (Scan = FormulaClauses; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
 		clause_SetFlag((CLAUSE) list_Car(Scan), CONCLAUSE);
+
+//#ifdef _TRUNGTQ_CODE_
+//
+//		printf("============Clause created: ");
+//		clause_Print(list_Car(Scan));
+//		printf("\n");
+//
+//#endif
+
+	}
 	/* For FormulaClauses a full saturation */
 	/* List is deleted in red_SatUnit ! */
 	EmptyClauses = red_SatUnit(Search, FormulaClauses);
@@ -3937,27 +3949,6 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 		UsedTerms = list_Nil();
 		Pair = list_Car(Scan);
 
-//#ifdef _TRUNGTQ_CODE_
-//	/*
-//	* Tach lay cac term trong clause goc va cac justified literals
-//	*/
-//	char* tempLabel = (char*) list_PairFirst(Pair);
-//	TERM tempTerm = (TERM) list_PairSecond(Pair);
-//
-//	char* formulaeLabel = (char*) list_PairFirst((LIST) list_Car(Scan));
-//	char* markString = "Justification";
-//	LIST justifiedTermList = NULL; // list justified literals
-//	TERM originTerm = NULL; // origin term
-//	if (strncmp(formulaeLabel, markString, strlen(markString)) == 0) {
-//		// tach va thay the origin clause
-//		originTerm = (TERM)term_FirstArgument(term_FirstArgument(tempTerm));
-//		list_Rplacd(Pair, (LIST)originTerm);
-//		// tach va thay the label
-//		justifiedTermList = (LIST)term_ArgumentList((TERM)term_SecondArgument(tempTerm));
-//		list_Rplaca(Pair, "remove_justified_literals");
-//	}
-//#endif
-
 #ifdef CHECK_CNF
 		fputs("\nFormula : ", stdout);
 		term_Print((TERM) list_PairSecond(Pair));
@@ -3967,38 +3958,6 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 				(TERM) list_PairSecond(Pair)), (char*) list_PairFirst(
 				Pair), &UsedTerms, Symblist, Result, FALSE,
 				InputClauseToTermLabellist);
-
-
-//#ifdef _TRUNGTQ_CODE_
-//		/*
-//		* Neu clause co jutified literal thi ghep vao cac clause
-//		*/
-//		if (justifiedTermList != NULL) {
-//			LIST clauseList;
-//			for (clauseList = Ax; !list_Empty(clauseList); clauseList = list_Cdr(clauseList)) {
-//				CLAUSE tempClause = (CLAUSE)list_Car(clauseList);
-//
-//				// tinh justified literals
-//				LIST justifiedLiteralList = NULL;
-//				LIST termList;
-//				for (termList = justifiedTermList; !list_Empty(termList); termList = list_Cdr(termList)) {
-//					TERM tempTerm = (TERM)list_Car(termList);
-//					LITERAL tempLiteral = clause_LiteralCreate(tempTerm, tempClause);
-//					justifiedLiteralList = list_Cons(tempLiteral, justifiedLiteralList);
-//				}
-//
-//				// bo sung justified literals vao clause
-//				clause_SetJustifiedLiterals(tempClause, justifiedLiteralList);
-//			}
-//		}
-//#endif
-
-//		printf("************************************************************************************************\n");
-//		for (LIST list = Ax; !list_Empty(list); list = list_Cdr(list)) {
-//			CLAUSE newClause = list_Car(list);
-//			clause_Print(newClause);
-//			printf("\n");
-//		}
 
 		/* Set CONCLAUSE flag for clauses derived from conjectures */
 		if (list_PointerMember(ConjectureList, list_PairSecond(Pair))) {

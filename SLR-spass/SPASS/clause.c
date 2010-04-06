@@ -3345,6 +3345,16 @@ void clause_DeleteFromSharing(CLAUSE Clause, SHARED_INDEX ShIndex,
 	for (i = 0; i < length; i++)
 		clause_LiteralDeleteFromSharing(clause_GetLiteral(Clause, i), ShIndex);
 
+#ifdef _TRUNGTQ_CODE_
+
+	if (clause_HasJustifiedLiterals(Clause)) {
+		int justification_length = clause_NumOfJustifiedLits(Clause);
+		for (int d = 0; d < justification_length; d++)
+			clause_LiteralDeleteFromSharing(clause_GetJustifiedLiteral(Clause, d), ShIndex);
+	}
+
+#endif
+
 	clause_FreeLitArray(Clause);
 
 	list_Delete(clause_ParentClauses(Clause));
