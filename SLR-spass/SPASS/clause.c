@@ -73,9 +73,9 @@ static __inline__ void clause_FreeLitArray(CLAUSE Clause) {
 
 #ifdef _TRUNGTQ_CODE_
 
-	Length = clause_NumOfJustifiedLits(Clause);
-	if (Length > 0)
-		memory_Free(Clause->justifiedLiterals, sizeof(LITERAL) * Length);
+	NAT justi_length = clause_NumOfJustifiedLits(Clause);
+	if (justi_length > 0)
+		memory_Free(Clause->justi_literals, sizeof(LITERAL) * justi_length);
 
 #endif
 }
@@ -396,7 +396,7 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 
 #ifdef _TRUNGTQ_CODE_
 
-	LIST clause_CopyJustification(CLAUSE Clause)
+	LIST clause_CopyJustiLiteralList(CLAUSE Clause)
 	/**************************************************************
 	 INPUT:   A clause.
 	 RETURNS: The list of copied JUSTIFIED literals o dang TERM (ko co dau) from <Clause>.
@@ -405,61 +405,58 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 //		return clause_CopyLitInterval(Clause,
 //				clause_FirstJustifiedLitIndex(Clause),
 //				clause_LastJustifiedLitIndex(Clause));
-		LIST list;
-		TERM atom;
 
-		list = list_Nil();
+		LIST justi_literal_list = list_Nil();
 
 		for (int index = 0; index < clause_NumOfJustifiedLits(Clause); index++) {
-			atom = term_Copy(clause_LiteralAtom(Clause->justifiedLiterals[index]));
-			list = list_Cons(atom, list);
+			LITERAL lit = clause_LiteralCopy(Clause->justi_literals[index]);
+			justi_literal_list = list_Cons(lit, justi_literal_list);
 		}
 
-		return list;
+		return justi_literal_list;
 	}
 
-	LIST clause_CopyJustificationExcept(CLAUSE Clause, int i)
+	LIST clause_CopyJustiLiteralListExcept(CLAUSE Clause, int i)
 	/**************************************************************
 	 INPUT:   A clause.
 	 RETURNS: A list containing copies of all JUSTFIED literals
 	 except <i>.
 	 ***************************************************************/
 	{
-		LIST list;
-		TERM atom;
-
-		list = list_Nil();
+		LIST justi_literal_list = list_Nil();
 
 		for (int index = 0; index <= clause_NumOfJustifiedLits(Clause); index++)
-			if (index != i)
-			{
-				atom = term_Copy(clause_LiteralAtom(Clause->justifiedLiterals[index]));
-				list = list_Cons(atom, list);
-			}
-		return list;
+		if (index != i)
+		{
+			LITERAL lit = clause_LiteralCopy(Clause->justi_literals[index]);
+			justi_literal_list = list_Cons(lit, justi_literal_list);
+		}
+		return justi_literal_list;
 	}
 
-	LIST clause_MergeJustitication(LIST JustList1, LIST JustList2)
+	LIST clause_MergeJustiLiteralList(LIST JustiList1, LIST JustiList2)
 	/*********************************
 	 * Ghep 2 list Justification thanh 1 list, loai bo cac phan tu trung nhau
 	 *********************************/
 	{
 
-		LIST list = list_Nil();
+		LIST justi_literal_list = list_Nil();
 
-		for (LIST scan = JustList1; !list_Empty(scan); scan = list_Cdr(scan))
+		for (LIST scan = JustiList1; !list_Empty(scan); scan = list_Cdr(scan))
 		{
-			TERM atom = list_Car(scan);
-			list = list_Cons(atom, list);
+			LITERAL lit = clause_LiteralCopy(list_Car(scan));
+			justi_literal_list = list_Cons(lit, justi_literal_list);
 		}
 
-		for (LIST scan2 = JustList2; !list_Empty(scan2); scan2 = list_Cdr(scan2))
+		for (LIST scan2 = JustiList2; !list_Empty(scan2); scan2 = list_Cdr(scan2))
 		{
-			TERM atom2 = list_Car(scan2);
+			LITERAL lit2 = clause_LiteralCopy(list_Car(scan2));
+			TERM atom2 = clause_LiteralAtom(lit2);
 			BOOL isConcisive = FALSE;
 
-			for (LIST scan1 = JustList1; !list_Empty(scan1); scan1 = list_Cdr(scan1)) {
-				TERM atom1 = list_Car(scan1);
+			for (LIST scan1 = JustiList1; !list_Empty(scan1); scan1 = list_Cdr(scan1)) {
+				LITERAL lit1 = list_Car(scan1);
+				TERM atom1 = clause_LiteralAtom(lit1);
 				// chi can so sanh 2 term theo symbol
 				if (term_CompareBySymbolOccurences(atom1, atom2) == 0) {
 					isConcisive = TRUE;
@@ -468,10 +465,10 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 			}
 
 			if (isConcisive == FALSE)
-				list = list_Cons(atom2, list);
+				justi_literal_list = list_Cons(lit2, justi_literal_list);
 		}
 
-		return list;
+		return justi_literal_list;
 	}
 
 #endif
@@ -1207,11 +1204,11 @@ CLAUSE clause_Copy(CLAUSE Clause)		// edited: da add justification
 	int j;
 	Result->j = (j = clause_NumOfJustifiedLits(Clause));
 	if (j != 0)
-		Result->justifiedLiterals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
+		Result->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
 
 	for (i = 0; i < j; i++) {
 		clause_SetJustifiedLiteral(Result, j, clause_LiteralCopy(clause_GetJustifiedLiteral(Clause, i)));
-		clause_LiteralSetOwningClause((Result->justifiedLiterals[i]), Result);
+		clause_LiteralSetOwningClause((Result->justi_literals[i]), Result);
 	}
 
 #endif
@@ -2598,7 +2595,7 @@ void clause_Init(void)
 					* sizeof(LITERAL));
 
 		if (JustificationLength != 0)
-			Result->justifiedLiterals = (LITERAL *) memory_Malloc((JustificationLength)
+			Result->justi_literals = (LITERAL *) memory_Malloc((JustificationLength)
 					* sizeof(LITERAL));
 
 		clause_SetFromInput(Result);
@@ -2677,7 +2674,7 @@ void clause_Init(void)
 
 		if (!clause_IsEmptyClause(Result)) {
 			Result->literals = (LITERAL *) memory_Malloc((c + a + s) * sizeof(LITERAL));
-			Result->justifiedLiterals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
+			Result->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
 		}
 
 		for (i = 0; i < c; i++) {
@@ -2702,7 +2699,7 @@ void clause_Init(void)
 
 		// them justified
 		for (int d = 0; d < j; d++) {
-			Result->justifiedLiterals[d] = clause_LiteralCreate((TERM) list_Car(Justification), Result);
+			Result->justi_literals[d] = clause_LiteralCreate((TERM) list_Car(Justification), Result);
 			Justification = list_Cdr(Justification);
 		}
 
@@ -2817,7 +2814,7 @@ void clause_Init(void)
 
 		if (!clause_IsEmptyClause(Result)) {
 			Result->literals = (LITERAL *) memory_Malloc((c + a + s) * sizeof(LITERAL));
-			Result->justifiedLiterals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
+			Result->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
 		}
 
 		for (i = 0; i < c; i++) {
@@ -2840,7 +2837,7 @@ void clause_Init(void)
 		}
 
 		for (int d = 0; d < j; d++) {
-			Result->justifiedLiterals[d]
+			Result->justi_literals[d]
 					= clause_LiteralCreate(list_Car(Justification), Result);
 			Justification = list_Cdr(Justification);
 		}
@@ -2975,7 +2972,7 @@ void clause_Init(void)
 			}
 
 			for (i = 0; i < j; i++) {
-				Result->justifiedLiterals[i] =
+				Result->justi_literals[i] =
 						clause_LiteralCreate((TERM) list_Car(Justification), Result);
 				Justification = list_Cdr(Justification);
 			}

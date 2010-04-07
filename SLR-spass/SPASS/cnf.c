@@ -1577,6 +1577,16 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 	CLAUSE clause;
 	int j;
 
+#ifdef _TRUNGTQ_CODE_
+
+	LIST justi_term_list = list_Nil();
+	for (LIST new_scan = term_JustificationList(term); !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+		TERM justi_term = term_Copy(list_Car(new_scan));
+		justi_term_list = list_Cons(justi_term, justi_term_list);
+	}
+
+#endif
+
 	termlist = list_Nil();
 	clauselist = list_Nil();
 
@@ -1587,6 +1597,18 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 		termlist = list_List(term_Copy(term));
 		clause = clause_CreateFromLiterals(termlist, Sorts, Conclause, TRUE,
 				Flags, Precedence);
+
+#ifdef _TRUNGTQ_CODE_
+
+		LIST justi_literal_list = list_Nil();
+		for (LIST new_scan = justi_term_list; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+			TERM justi_term = term_Copy(list_Car(new_scan));
+			LITERAL justi_literal = clause_LiteralCreate(justi_term, clause);
+			justi_literal_list = list_Cons(justi_literal, justi_literal_list);
+		}
+		clause_SetJustifiedLiterals(clause, justi_literal_list);
+
+#endif
 		clauselist = list_Nconc(clauselist, list_List(clause));
 		term_StartMinRenaming();
 		term_Rename(clause_GetLiteralTerm(clause, 0));
@@ -1612,19 +1634,21 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 			} else
 				termlist = list_List(term_Copy(list_Car(scan)));
 
-#ifdef _TRUNGTQ_CODE_
-			for (LIST new_scan = termlist; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-				printf("============TERM of TERMLIST : ");
-				term_Print(list_Car(new_scan));
-				printf("\n");
+			if (!list_Empty(termlist)) {
+				clause = clause_CreateFromLiterals(termlist, Sorts, Conclause,	TRUE, Flags, Precedence);
 
-			}
+#ifdef _TRUNGTQ_CODE_
+
+				LIST justi_literal_list = list_Nil();
+				for (LIST new_scan = justi_term_list; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+					TERM justi_term = term_Copy(list_Car(new_scan));
+					LITERAL justi_literal = clause_LiteralCreate(justi_term, clause);
+					justi_literal_list = list_Cons(justi_literal, justi_literal_list);
+				}
+				clause_SetJustifiedLiterals(clause, justi_literal_list);
 
 #endif
 
-			if (!list_Empty(termlist)) {
-				clause = clause_CreateFromLiterals(termlist, Sorts, Conclause,
-						TRUE, Flags, Precedence);
 				term_StartMinRenaming();
 				for (j = 0; j < clause_Length(clause); j++)
 					term_Rename(clause_GetLiteralTerm(clause, j));
@@ -1644,8 +1668,20 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 			termlist = list_List(term_Copy(term));
 
 		if (!list_Empty(termlist)) {
-			clause = clause_CreateFromLiterals(termlist, Sorts, Conclause,
-					TRUE, Flags, Precedence);
+			clause = clause_CreateFromLiterals(termlist, Sorts, Conclause, TRUE, Flags, Precedence);
+
+#ifdef _TRUNGTQ_CODE_
+
+			LIST justi_literal_list = list_Nil();
+			for (LIST new_scan = justi_term_list; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+				TERM justi_term = term_Copy(list_Car(new_scan));
+				LITERAL justi_literal = clause_LiteralCreate(justi_term, clause);
+				justi_literal_list = list_Cons(justi_literal, justi_literal_list);
+			}
+			clause_SetJustifiedLiterals(clause, justi_literal_list);
+
+#endif
+
 			term_StartMinRenaming();
 			for (j = 0; j < clause_Length(clause); j++)
 				term_Rename(clause_GetLiteralTerm(clause, j));
@@ -1661,8 +1697,28 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 		list_Delete(condlist);
 	}
 
+#ifdef _TRUNGTQ_CODE_
+
+	printf("Clause before subsumption: \n");
+	for (LIST new_scan = clauselist; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+		clause_Print(list_Car(new_scan));
+	}
+	printf("\n");
+
+#endif
+
 	// TTQ_COMMENT . subsumption clause list
 	clauselist = cnf_SubsumeClauseList(clauselist);
+
+#ifdef _TRUNGTQ_CODE_
+
+	printf("Clause after subsumption: \n");
+	for (LIST new_scan = clauselist; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+		clause_Print(list_Car(new_scan));
+	}
+	printf("\n");
+#endif
+
 	newclauselist = list_Nil();
 	while (!list_Empty(clauselist)) {
 		clause = res_SelectLightestClause(clauselist);

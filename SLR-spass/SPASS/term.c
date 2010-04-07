@@ -427,7 +427,10 @@ TERM term_Copy(TERM Term)
 #ifdef _TRUNGTQ_CODE_
 
 	// copy justification
-	Result -> justification = term_JustificationList(Term);
+	LIST new_scan, JustiList;
+	for (new_scan = JustiList = list_Copy(term_JustificationList(Term)); list_Exist(new_scan); new_scan	= list_Cdr(new_scan))
+		list_Rplaca(new_scan, term_Copy(list_Car(new_scan)));
+	Result -> justification = JustiList;
 
 #endif
 
@@ -1169,11 +1172,11 @@ void term_InstallSize(TERM Term)
 
 #ifdef _TRUNGTQ_CODE_
 
-	// size of justification
-	for (Scan = term_JustificationList(Term); !list_Empty(Scan); Scan = list_Cdr(Scan)) {
-			term_InstallSize((TERM) list_Car(Scan));
-			Weight += term_Size((TERM) list_Car(Scan));
-		};
+//	// size of justification
+//	for (Scan = term_JustificationList(Term); !list_Empty(Scan); Scan = list_Cdr(Scan)) {
+//			term_InstallSize((TERM) list_Car(Scan));
+//			Weight += term_Size((TERM) list_Car(Scan));
+//		};
 
 #endif
 

@@ -120,7 +120,7 @@ static CLAUSE inf_CreateURUnitResolvent(CLAUSE Clause, int i, SUBST Subst, LIST 
 #ifdef _TRUNGTQ_CODE_
 	LIST Justification = list_Nil();
 	if (clause_HasJustifiedLiterals(Clause) == TRUE) {
-		Justification  = (LIST)clause_CopyJustification(Clause);
+		Justification  = (LIST)clause_CopyJustiLiteralList(Clause);
 	}
 
 	if (i <= clause_LastConstraintLitIndex(Clause))

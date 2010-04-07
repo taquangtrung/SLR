@@ -1767,7 +1767,7 @@ static CLAUSE red_CRwLitTautologyCheck(PROOFSEARCH Search, CLAUSE RedClause,
 
 		LIST NewJustification = list_Nil();
 		if (clause_HasJustifiedLiterals(RedClause) == TRUE)
-			NewJustification = clause_CopyJustification(RedClause);
+			NewJustification = clause_CopyJustiLiteralList(RedClause);
 
 		aux = clause_Create(NegLits, list_Nil(), list_Nil(), NewJustification, Flags, Precedence);
 
@@ -4296,7 +4296,7 @@ BOOL red_ClauseDeletion(SORTTHEORY Theory, CLAUSE RedClause, FLAGSTORE Flags,
 
 		LIST NewJustification = list_Nil();
 		if (clause_HasJustifiedLiterals(RedClause) == TRUE)
-			NewJustification = clause_CopyJustification(RedClause);
+			NewJustification = clause_CopyJustiLiteralList(RedClause);
 		ConstraintClause = clause_Create(Scan, list_Nil(), list_Nil(), NewJustification, Flags, Precedence);
 
 #else
@@ -4441,6 +4441,16 @@ LIST red_SatUnit(PROOFSEARCH Search, LIST ClauseList)
 	EmptyClauses = list_Nil();
 
 	ClauseList = clause_ListSortWeighed(ClauseList);
+
+#ifdef _TRUNGTQ_CODE_
+	printf("Clause in red_SatUnit: \n");
+	for (LIST new_scan = ClauseList; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+		clause_Print(list_Car(new_scan));
+		printf("\n");
+	}
+	printf("\n");
+
+#endif
 
 	while (!list_Empty(ClauseList) && list_Empty(EmptyClauses)) {
 		Given = (CLAUSE) list_NCar(&ClauseList);

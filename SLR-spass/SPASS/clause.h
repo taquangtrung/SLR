@@ -151,7 +151,7 @@ typedef enum {
 		LITERAL *literals; /* An Array of (c+a+s) literalpointers in this order. */
 
 		//<------- Bo sung them danh sach cac justified literals duoc bo sung vao clause
-		LITERAL *justifiedLiterals;
+		LITERAL *justi_literals;
 		int j; /* number of justified literals */
 		//----------------------------------------------------------------------------->
 
@@ -252,8 +252,8 @@ LIST clause_CopySuccedent(CLAUSE);
 LIST clause_CopySuccedentExcept(CLAUSE, int);
 
 #ifdef _TRUNGTQ_CODE_
-	LIST clause_CopyJustification(CLAUSE Clause);
-	LIST clause_CopyJustificationExcept(CLAUSE Clause, int);
+	LIST clause_CopyJustiLiteralList(CLAUSE Clause);
+	LIST clause_CopyJustiLiteralListExcept(CLAUSE Clause, int);
 #endif
 
 /**************************************************************/
@@ -717,11 +717,11 @@ static __inline__ LIST clause_GetLiteralListExcept(CLAUSE Clause, int Index)
 	/**************************************************************/
 
 	static __inline__ LITERAL clause_GetJustifiedLiteral(CLAUSE C, int Index) {
-		return C->justifiedLiterals[Index];
+		return C->justi_literals[Index];
 	}
 
 	static __inline__ void clause_SetJustifiedLiteral(CLAUSE C, int Index, LITERAL L) {
-		C->justifiedLiterals[Index] = L;
+		C->justi_literals[Index] = L;
 	}
 
 	static __inline__ TERM clause_GetJustifiedLiteralTerm(CLAUSE C, int Index) {
@@ -745,7 +745,7 @@ static __inline__ LIST clause_GetLiteralListExcept(CLAUSE Clause, int Index)
 	}
 
 	static __inline__ LITERAL clause_FirstJustifiedLit(CLAUSE Clause) {
-		return Clause->justifiedLiterals[clause_FirstJustifiedLitIndex(Clause)];
+		return Clause->justi_literals[clause_FirstJustifiedLitIndex(Clause)];
 	}
 
 	static __inline__ int clause_LastJustifiedLitIndex(CLAUSE Clause) {
@@ -753,7 +753,7 @@ static __inline__ LIST clause_GetLiteralListExcept(CLAUSE Clause, int Index)
 	}
 
 	static __inline__ LITERAL clause_LastJustifiedLit(CLAUSE Clause) {
-		return Clause->justifiedLiterals[clause_LastJustifiedLitIndex(Clause)];
+		return Clause->justi_literals[clause_LastJustifiedLitIndex(Clause)];
 	}
 
 	static __inline__ LIST clause_GetJustifiedLiteralList(CLAUSE Clause)
@@ -1092,11 +1092,11 @@ static __inline__ void clause_SetParentLiterals(CLAUSE Clause, LIST PLits) {
 	static __inline__ void clause_SetJustifiedLiterals(CLAUSE Clause, LIST PLits) {
 		int j = list_Length(PLits);
 		Clause->j = j;
-		Clause->justifiedLiterals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
+		Clause->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
 		for (int d = 0; d < j; d++) {
-			LITERAL tempLiteral = list_Car(PLits);
+			LITERAL tempLiteral = clause_LiteralCopy(list_Car(PLits));
 			clause_LiteralSetOwningClause(tempLiteral, Clause);
-			Clause->justifiedLiterals[d] = tempLiteral;
+			Clause->justi_literals[d] = tempLiteral;
 			PLits = list_Cdr(PLits);
 		}
 

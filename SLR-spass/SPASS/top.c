@@ -1542,6 +1542,7 @@ int main(int argc, const char* argv[]) {
 			printf("\n");
 
 			if (strncmp(formulae_label, mark_string, strlen(mark_string)) == 0) {
+				// FIXME : co van de o doan nay:
 				/*
 				 * Tach va thay the term
 				 */
@@ -1561,19 +1562,21 @@ int main(int argc, const char* argv[]) {
 				}
 
 				// ghep justification vao term
+//				list_Delete(term_JustificationList(origin_Term));
 				term_RplacJustificationList(origin_Term, new_justification);
 
 				term_Delete(current_Term);
 
+
 				// thay the term thu dc vao list
-				list_Rplacd(current_Axiom, (LIST)origin_Term);
+				list_Rplacd(current_Axiom, origin_Term);
 				// tach va thay the label
-				list_Rplaca(current_Axiom, "remove_justified_literals");
+//				list_Rplaca(current_Axiom, "remove_justified_literals");
 
 				current_Term = (TERM) list_PairSecond(current_Axiom);
 
 				printf("    Edited term: ");
-				term_Print(origin_Term);
+				term_Print(current_Term);
 				printf("\n");
 			}
 	}

@@ -224,7 +224,7 @@ static CLAUSE inf_BuildConstraintHyperResolvent(CLAUSE Clause, LIST Lits, SUBST 
 
 			LIST Justification = list_Nil();
 			if (clause_HasJustifiedLiterals(Clause) == TRUE) {
-				Justification  = (LIST)clause_CopyJustification(Clause);
+				Justification  = (LIST)clause_CopyJustiLiteralList(Clause);
 			}
 
 			NewClause = clause_CreateUnnormalized(Constraint, Antecedent, Succedent, Justification);
@@ -317,7 +317,7 @@ static CLAUSE inf_BuildConstraintHyperResolvent(CLAUSE Clause, LIST Lits, SUBST 
 
 	LIST Justification1 = list_Nil();
 	if (clause_HasJustifiedLiterals(Clause) == TRUE) {
-		Justification1  = (LIST)clause_CopyJustification(Clause);
+		Justification1  = (LIST)clause_CopyJustiLiteralList(Clause);
 	}
 
 	NewClause = clause_Create(Constraint, Antecedent, Succedent, Justification1, Flags, Precedence);
@@ -1159,7 +1159,7 @@ static LIST inf_ApplyWeakening(CLAUSE Clause, LIST TLits, LIST Partners, CONDITI
 
 	LIST Justification = list_Nil();
 	if (clause_HasJustifiedLiterals(Clause) == TRUE) {
-		Justification  = (LIST)clause_CopyJustification(Clause);
+		Justification  = (LIST)clause_CopyJustiLiteralList(Clause);
 	}
 
 	newClause = clause_Create(constraint, antecedent, succedent, Justification, Flags, Precedence);

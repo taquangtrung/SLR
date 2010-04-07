@@ -1646,7 +1646,7 @@ static LIST sort_ApproxHornClauses(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Pr
 
 				LIST NewJustification = list_Nil();
 				if (clause_HasJustifiedLiterals(Clause) == TRUE)
-					NewJustification  = (LIST)clause_CopyJustification(Clause);
+					NewJustification  = (LIST)clause_CopyJustiLiteralList(Clause);
 				NewClause = clause_Create(NewConstraint, list_Nil(), NewSuccedent, NewJustification, Flags, Precedence);
 
 #else
@@ -1722,7 +1722,7 @@ LIST sort_ApproxMaxDeclClauses(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Preced
 
 			LIST NewJustification = list_Nil();
 			if (clause_HasJustifiedLiterals(Clause) == TRUE)
-				NewJustification  = (LIST)clause_CopyJustification(Clause);
+				NewJustification  = (LIST)clause_CopyJustiLiteralList(Clause);
 			NewClause = clause_Create(NewConstraint, list_Nil(), NewSuccedent, NewJustification, Flags, Precedence);
 
 #else

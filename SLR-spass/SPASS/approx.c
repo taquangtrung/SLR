@@ -197,7 +197,7 @@ static LIST approx_ApplyProjection(APPROX_TRANSLATION Translation, CLAUSE Clause
 
 		LIST Justification = list_Nil();
 			if (clause_HasJustifiedLiterals(Clause) == TRUE) {
-				Justification  = (LIST)clause_CopyJustification(Clause);
+				Justification  = (LIST)clause_CopyJustiLiteralList(Clause);
 			}
 
 		/* create the new clause */
@@ -558,7 +558,7 @@ static CLAUSE approx_MakeClauseLinear(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE
 
 	LIST Justification = list_Nil();
 	if (clause_HasJustifiedLiterals(Clause) == TRUE) {
-		Justification  = (LIST)clause_CopyJustification(Clause);
+		Justification  = (LIST)clause_CopyJustiLiteralList(Clause);
 	}
 
 	/* Create the new clause */
@@ -725,8 +725,8 @@ static LIST approx_ApplyFlattening(CLAUSE Clause, LIST Duplicates, BOOL CheckNeg
 	LIST Justification1 = list_Nil();
 	LIST Justification2 = list_Nil();
 	if (clause_HasJustifiedLiterals(Clause) == TRUE) {
-		Justification1  = (LIST)clause_CopyJustification(Clause);
-		Justification2  = (LIST)clause_CopyJustification(Clause);
+		Justification1  = (LIST)clause_CopyJustiLiteralList(Clause);
+		Justification2  = (LIST)clause_CopyJustiLiteralList(Clause);
 	}
 
 	Clause1 = clause_Create(Constraint1, Antecedent1, Succedent1, Justification1, Flags, Precedence);
@@ -1014,7 +1014,7 @@ LIST approx_MakeHorn(CLAUSE Clause, FLAGSTORE Flags, PRECEDENCE Precedence)
 
 			LIST Justification = list_Nil();
 			if (clause_HasJustifiedLiterals(Clause) == TRUE) {
-				Justification  = (LIST)clause_CopyJustification(Clause);
+				Justification  = (LIST)clause_CopyJustiLiteralList(Clause);
 			}
 
 			NewClause = clause_Create(Constraint, Antecedent, Succedent, Justification, Flags, Precedence);

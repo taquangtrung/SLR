@@ -2052,24 +2052,21 @@ static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 
 #ifdef _TRUNGTQ_CODE_
 
-	LIST JustificationOfGiven = clause_GetJustifiedLiteralList(GivenClause);
-	LIST JustificationOfPartner = clause_GetJustifiedLiteralList(PartnerClause);
+	LIST JustiLiteralOfGiven = clause_GetJustifiedLiteralList(GivenClause);
+	LIST JustiLiteralOfPartner = clause_GetJustifiedLiteralList(PartnerClause);
 
-	int length1 = list_Length(JustificationOfGiven);
-	int length2 = list_Length(JustificationOfPartner);
+	int length1 = list_Length(JustiLiteralOfGiven);
+	int length2 = list_Length(JustiLiteralOfPartner);
 
 	printf("Length 1: %d - Length 2: %d", length1, length2); printf("\n");
 
-	LIST NewJustification = clause_MergeJustitication(JustificationOfGiven, JustificationOfPartner);
+	LIST NewJustification = clause_MergeJustiLiteralList(JustiLiteralOfGiven, JustiLiteralOfPartner);
 	int just_length = list_Length(NewJustification);
 
 	NewClause = clause_CreateBody((clause_Length(GivenClause) - 1) + clause_Length(PartnerClause) - 1, just_length);
 
 	// set justification for clause
-	if (!list_Empty(NewJustification)) {
-		clause_SetJustifiedLiterals(NewClause, NewJustification);
-
-	}
+	clause_SetJustifiedLiterals(NewClause, NewJustification);
 
 #else
 
@@ -2155,15 +2152,15 @@ static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 		clause_SetLiteral(NewClause, (j + help), clause_LiteralCreate(subst_Apply(
 				SubstPartnerTermS, term_Copy(clause_GetLiteralTerm(PartnerClause, j))), NewClause));
 	} /* end of NewClause creation (last for loop). */
-
-	clause_SetDataFromParents(NewClause, PartnerClause, pi, GivenClause, i, Flags, Precedence);
-	clause_SetFromGeneralResolution(NewClause);
-
 #ifdef _TRUNGTQ_CODE_
 
 	printf("   ResultClause: "); clause_Print(NewClause); printf("\n");
 
 #endif
+	clause_SetDataFromParents(NewClause, PartnerClause, pi, GivenClause, i, Flags, Precedence);
+	clause_SetFromGeneralResolution(NewClause);
+
+
 
 	return (NewClause);
 }
@@ -3469,7 +3466,7 @@ static CLAUSE inf_BuildHyperResolvent(CLAUSE Nucleus, SUBST Subst, LIST FoundMap
 
 	LIST Justification = list_Nil();
 	if (clause_HasJustifiedLiterals(Nucleus) == TRUE) {
-		Justification  = (LIST)clause_CopyJustification(Nucleus);
+		Justification  = (LIST)clause_CopyJustiLiteralList(Nucleus);
 	}
 
 	/* create new clause and set clause data */
