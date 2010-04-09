@@ -451,14 +451,14 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 		for (LIST scan2 = JustiList2; !list_Empty(scan2); scan2 = list_Cdr(scan2))
 		{
 			LITERAL lit2 = clause_LiteralCopy(list_Car(scan2));
-			TERM atom2 = clause_LiteralAtom(lit2);
+			TERM atom2 = clause_LiteralSignedAtom(lit2);
 			BOOL isConcisive = FALSE;
 
 			for (LIST scan1 = JustiList1; !list_Empty(scan1); scan1 = list_Cdr(scan1)) {
 				LITERAL lit1 = list_Car(scan1);
-				TERM atom1 = clause_LiteralAtom(lit1);
+				TERM atom1 = clause_LiteralSignedAtom(lit1);
 				// chi can so sanh 2 term theo symbol
-				if (term_CompareBySymbolOccurences(atom1, atom2) == 0) {
+				if (term_CompareAbstract(atom1, atom2) == 0) {
 					isConcisive = TRUE;
 					break;
 				}
@@ -1207,7 +1207,7 @@ CLAUSE clause_Copy(CLAUSE Clause)		// edited: da add justification
 		Result->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
 
 	for (i = 0; i < j; i++) {
-		clause_SetJustifiedLiteral(Result, j, clause_LiteralCopy(clause_GetJustifiedLiteral(Clause, i)));
+		clause_SetJustifiedLiteral(Result, i, clause_LiteralCopy(clause_GetJustifiedLiteral(Clause, i)));
 		clause_LiteralSetOwningClause((Result->justi_literals[i]), Result);
 	}
 
@@ -3169,6 +3169,75 @@ CLAUSE clause_CreateFromLiterals(LIST LitList, BOOL Sorts, BOOL Conclause,
 
 	return Result;
 }
+
+
+#ifdef _TRUNGTQ_CODE_
+
+	CLAUSE clause_CreateFromLiteralsWithJusti(LIST LitList, LIST JustiList, BOOL Sorts, BOOL Conclause,
+			BOOL Ordering, FLAGSTORE Flags, PRECEDENCE Precedence)
+
+	// Ham nay chi thuc hien de doc input, KO thay doi justified
+
+	/**************************************************************
+	 INPUT:   A list of literals, three boolean flags indicating whether
+	 sort constraint literals should be generated, whether the
+	 clause is a conjecture clause, whether the ordering information
+	 should be established, a flag store and a precedence.
+	 RETURNS: The new generated clause.
+	 EFFECT:  The result clause will be normalized and the maximal
+	 variable will be set. If <Ordering> is FALSE no additional
+	 initializations will be done. This mode is intended for
+	 the parser for creating clauses at a time when the ordering
+	 and weight flags aren't determined finally.
+	 Only if <Ordering> is TRUE the equations will be oriented,
+	 the maximal literals will be marked and the clause weight
+	 will be set correctly.
+	 MEMORY:  Allocates a CLAUSE_NODE and the needed LITERAL_NODEs,
+	 uses the terms from the lists.
+	 ****************************************************************/
+	{
+		CLAUSE Result;
+		LIST Antecedent, Succedent, Constraint, Justification;
+		TERM Atom;
+
+		Antecedent = list_Nil();
+		Succedent = list_Nil();
+		Constraint = list_Nil();
+
+		while (!list_Empty(LitList)) {
+			if (term_TopSymbol(list_Car(LitList)) == fol_Not()) {
+				Atom = term_FirstArgument(list_Car(LitList));
+				if (Sorts && symbol_IsBaseSort(term_TopSymbol(Atom))
+						&& term_IsVariable(term_FirstArgument(Atom)))
+					Constraint = list_Cons(list_Car(LitList), Constraint);
+				else
+					Antecedent = list_Cons(list_Car(LitList), Antecedent);
+			} else
+				Succedent = list_Cons(list_Car(LitList), Succedent);
+			LitList = list_Cdr(LitList);
+		}
+
+		Constraint = list_NReverse(Constraint);
+		Antecedent = list_NReverse(Antecedent);
+		Succedent = list_NReverse(Succedent);
+
+		Result = clause_CreateCrude(Constraint, Antecedent, Succedent, JustiList, Conclause);
+
+		list_Delete(Constraint);
+		list_Delete(Antecedent);
+		list_Delete(Succedent);
+
+		if (Ordering)
+			clause_OrientAndReInit(Result, Flags, Precedence);
+		else {
+			clause_Normalize(Result);
+			clause_UpdateMaxVar(Result);
+		}
+
+		return Result;
+	}
+
+#endif
 
 void clause_SetSortConstraint(CLAUSE Clause, BOOL Strong, FLAGSTORE Flags,
 		PRECEDENCE Precedence)

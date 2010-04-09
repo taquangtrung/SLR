@@ -4454,17 +4454,44 @@ LIST red_SatUnit(PROOFSEARCH Search, LIST ClauseList)
 
 	while (!list_Empty(ClauseList) && list_Empty(EmptyClauses)) {
 		Given = (CLAUSE) list_NCar(&ClauseList);
+
+#ifdef _TRUNGTQ_CODE_
+		printf("111111Clause in red_SatUnit: \n");
+		for (LIST new_scan = ClauseList; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+			clause_Print(list_Car(new_scan));
+			printf("\n");
+		}
+
+		printf("Given: ");
+		clause_Print(Given);
+		printf("\n");
+#endif
+
 		Given = red_ReductionOnDerivedClause(Search, Given, red_USABLE);
+
 		if (Given) {
+
 			if (clause_IsEmptyClause(Given))
 				EmptyClauses = list_List(Given);
 			else {
 				BackReduced = red_BackReduction(Search, Given, red_USABLE);
 
 				if (Derived != 0) {
+
+
 					Derivables = inf_BoundedDepthUnitResolution(Given,
 							prfs_UsableSharingIndex(Search), FALSE, Flags,
 							Precedence);
+
+#ifdef _TRUNGTQ_CODE_
+	printf("Derivables in red_SatUnit: \n");
+		for (LIST new_scan = Derivables; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+			clause_Print(list_Car(new_scan));
+			printf("\n");
+		}
+		printf("\n");
+
+#endif
 					n = list_Length(Derivables);
 					if (n > Derived)
 						Derived = 0;
@@ -4684,41 +4711,6 @@ LIST red_SatInput(PROOFSEARCH Search)
 			ClauseList = list_Nconc(Derivables, ClauseList);
 		}
 		Scan = list_Cdr(Scan);
-	}
-
-//	if (codeUser == TrungTQ) {
-//		// TTQ_COMMENT . Print Derivables.
-//		if (!list_Empty(ClauseList)) {
-//			printf("\n===Print derived clauses from red_SatInput: \n");
-//			clause_ListPrint(ClauseList);
-//			printf("\n     ... end print \n");
-//		}
-//	}
-
-	if (codeUser == TrungTQ) {
-		printf("\n===Print derived clauses from red_SatInput: \n");
-		for (int ii = 1; ii <= list_Length(ClauseList); ii++) {
-			printf("== clause %d:\n", ii);
-			CLAUSE tempClause = list_NthElement(ClauseList, ii );
-			if (tempClause != NULL) {
-				LIST lstLit = clause_GetLiteralList(tempClause);
-				for (int jj = 1; jj <= list_Length(lstLit); jj++) {
-					printf("===== literal %d:", jj);
-					LITERAL tempLit = list_NthElement(lstLit, jj);
-					if (tempLit != NULL) {
-						clause_LiteralPrint(tempLit);
-//						LITERAL copiedLit = clause_LiteralCopy(tempLit);
-						printf(" --- ");
-//						CLAUSE owningClause = clause_LiteralOwningClause(copiedLit);
-						CLAUSE owningClause = clause_LiteralOwningClause(tempLit);
-						clause_Print(owningClause);
-					}
-					printf("\n");
-				}
-			}
-			printf("\n");
-		}
-		printf("============== end\n");
 	}
 
 	prfs_IncDerivedClauses(Search, list_Length(ClauseList));

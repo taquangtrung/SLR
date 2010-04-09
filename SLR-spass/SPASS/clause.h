@@ -230,11 +230,11 @@ void clause_Init(void);
 
 CLAUSE clause_CreateFromLiterals(LIST, BOOL, BOOL, BOOL, FLAGSTORE, PRECEDENCE);
 
-//#ifdef _TRUNGTQ_CODE_
-//
-//	CLAUSE clause_CreateFromLiteralLists(LIST, LIST, LIST, LIST, BOOL, TERM);
-//
-//#else
+#ifdef _TRUNGTQ_CODE_
+
+	CLAUSE clause_CreateFromLiteralListsWithJusti(LIST, LIST, LIST, LIST, BOOL, TERM);
+
+#endif
 
 	CLAUSE clause_CreateFromLiteralLists(LIST, LIST, LIST, BOOL, TERM);
 

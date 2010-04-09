@@ -1595,20 +1595,17 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 
 	if (fol_IsNegativeLiteral(term) || symbol_IsPredicate(term_TopSymbol(term))) {
 		termlist = list_List(term_Copy(term));
-		clause = clause_CreateFromLiterals(termlist, Sorts, Conclause, TRUE,
-				Flags, Precedence);
 
 #ifdef _TRUNGTQ_CODE_
 
-		LIST justi_literal_list = list_Nil();
-		for (LIST new_scan = justi_term_list; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-			TERM justi_term = term_Copy(list_Car(new_scan));
-			LITERAL justi_literal = clause_LiteralCreate(justi_term, clause);
-			justi_literal_list = list_Cons(justi_literal, justi_literal_list);
-		}
-		clause_SetJustifiedLiterals(clause, justi_literal_list);
+		clause = clause_CreateFromLiteralsWithJusti(termlist, justi_term_list, Sorts, Conclause, TRUE, Flags, Precedence);
+
+#else
+
+		clause = clause_CreateFromLiterals(termlist, Sorts, Conclause, TRUE, Flags, Precedence);
 
 #endif
+
 		clauselist = list_Nconc(clauselist, list_List(clause));
 		term_StartMinRenaming();
 		term_Rename(clause_GetLiteralTerm(clause, 0));
@@ -1635,19 +1632,17 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 				termlist = list_List(term_Copy(list_Car(scan)));
 
 			if (!list_Empty(termlist)) {
-				clause = clause_CreateFromLiterals(termlist, Sorts, Conclause,	TRUE, Flags, Precedence);
 
 #ifdef _TRUNGTQ_CODE_
 
-				LIST justi_literal_list = list_Nil();
-				for (LIST new_scan = justi_term_list; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-					TERM justi_term = term_Copy(list_Car(new_scan));
-					LITERAL justi_literal = clause_LiteralCreate(justi_term, clause);
-					justi_literal_list = list_Cons(justi_literal, justi_literal_list);
-				}
-				clause_SetJustifiedLiterals(clause, justi_literal_list);
+		clause = clause_CreateFromLiteralsWithJusti(termlist, justi_term_list, Sorts, Conclause, TRUE, Flags, Precedence);
+
+#else
+
+		clause = clause_CreateFromLiterals(termlist, Sorts, Conclause, TRUE, Flags, Precedence);
 
 #endif
+
 
 				term_StartMinRenaming();
 				for (j = 0; j < clause_Length(clause); j++)
@@ -1668,17 +1663,14 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 			termlist = list_List(term_Copy(term));
 
 		if (!list_Empty(termlist)) {
-			clause = clause_CreateFromLiterals(termlist, Sorts, Conclause, TRUE, Flags, Precedence);
 
 #ifdef _TRUNGTQ_CODE_
 
-			LIST justi_literal_list = list_Nil();
-			for (LIST new_scan = justi_term_list; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-				TERM justi_term = term_Copy(list_Car(new_scan));
-				LITERAL justi_literal = clause_LiteralCreate(justi_term, clause);
-				justi_literal_list = list_Cons(justi_literal, justi_literal_list);
-			}
-			clause_SetJustifiedLiterals(clause, justi_literal_list);
+			clause = clause_CreateFromLiteralsWithJusti(termlist, justi_term_list, Sorts, Conclause, TRUE, Flags, Precedence);
+
+#else
+
+			clause = clause_CreateFromLiterals(termlist, Sorts, Conclause, TRUE, Flags, Precedence);
 
 #endif
 
@@ -1696,28 +1688,8 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 			clause_DeleteLiterals(list_Car(scan), condlist, Flags, Precedence);
 		list_Delete(condlist);
 	}
-
-#ifdef _TRUNGTQ_CODE_
-
-	printf("Clause before subsumption: \n");
-	for (LIST new_scan = clauselist; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-		clause_Print(list_Car(new_scan));
-	}
-	printf("\n");
-
-#endif
-
 	// TTQ_COMMENT . subsumption clause list
 	clauselist = cnf_SubsumeClauseList(clauselist);
-
-#ifdef _TRUNGTQ_CODE_
-
-	printf("Clause after subsumption: \n");
-	for (LIST new_scan = clauselist; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-		clause_Print(list_Car(new_scan));
-	}
-	printf("\n");
-#endif
 
 	newclauselist = list_Nil();
 	while (!list_Empty(clauselist)) {
@@ -3930,7 +3902,7 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 
 #ifdef _TRUNGTQ_CODE_
 
-		printf("============Formula: ");
+		printf("============Formula in cnf_Flotter: ");
 		term_Print(Formula);
 		printf("\n");
 
@@ -3938,16 +3910,6 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 
 		FormulaClausesTemp = cnf_MakeClauseList(Formula, FALSE, FALSE, Flags,
 				Precedence);
-
-#ifdef _TRUNGTQ_CODE_
-
-		for (LIST new_scan = FormulaClausesTemp; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-			printf("============Clause created 1: ");
-			clause_Print(list_Car(new_scan));
-			printf("\n");
-		}
-
-#endif
 
 		if (flag_GetFlagValue(Flags, flag_DOCPROOF) || flag_GetFlagValue(Flags,
 				flag_FLOTTER)) {
@@ -3966,16 +3928,18 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 	/* red_SatUnit works only on conclauses */
 	for (Scan = FormulaClauses; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
 		clause_SetFlag((CLAUSE) list_Car(Scan), CONCLAUSE);
-
-//#ifdef _TRUNGTQ_CODE_
-//
-//		printf("============Clause created: ");
-//		clause_Print(list_Car(Scan));
-//		printf("\n");
-//
-//#endif
-
 	}
+
+#ifdef _TRUNGTQ_CODE_
+
+		for (LIST new_scan = FormulaClauses; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+			printf("============Clause created in cnf_Flotter: ");
+			clause_Print(list_Car(new_scan));
+			printf("\n");
+		}
+
+#endif
+
 	/* For FormulaClauses a full saturation */
 	/* List is deleted in red_SatUnit ! */
 	EmptyClauses = red_SatUnit(Search, FormulaClauses);

@@ -1550,31 +1550,35 @@ int main(int argc, const char* argv[]) {
 				TERM origin_Term = term_Copy((TERM)term_FirstArgument(current_Term));
 
 				// lay justification
-				LIST new_justification = list_Nil();
+//				LIST new_justification = list_Nil();
 
 				LIST old_justification = (LIST)term_ArgumentList((TERM)term_SecondArgument(current_Term));
-				for (LIST new_scan = old_justification; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-					TERM justification = list_Car(new_scan);
-					printf(" -- just: ");
-					term_Print(justification);
-					printf("\n");
-					new_justification = list_Cons(term_Copy(justification), new_justification);
-				}
+//				for (LIST new_scan = old_justification; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+//					TERM justification = list_Car(new_scan);
+//					printf(" -- justi: ");
+//					term_Print(justification);
+//					printf("\n");
+//					new_justification = list_Cons(term_Copy(justification), new_justification);
+//				}
+
+				LIST new_scan, new_justification;
+				for (new_scan = new_justification = list_Copy(old_justification); list_Exist(new_scan); new_scan	= list_Cdr(new_scan))
+					list_Rplaca(new_scan, term_Copy(list_Car(new_scan)));
+
 
 				// ghep justification vao term
-//				list_Delete(term_JustificationList(origin_Term));
+				list_Delete(term_JustificationList(origin_Term));
 				term_RplacJustificationList(origin_Term, new_justification);
 
 				term_Delete(current_Term);
 
 
 				// thay the term thu dc vao list
-				list_Rplacd(current_Axiom, origin_Term);
+				list_Rplacd(current_Axiom, (LIST)origin_Term);
 				// tach va thay the label
 //				list_Rplaca(current_Axiom, "remove_justified_literals");
 
 				current_Term = (TERM) list_PairSecond(current_Axiom);
-
 				printf("    Edited term: ");
 				term_Print(current_Term);
 				printf("\n");
