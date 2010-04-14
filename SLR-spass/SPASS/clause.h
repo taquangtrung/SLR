@@ -333,6 +333,12 @@ void clause_UpdateSplitField(CLAUSE C1, CLAUSE C2);
 BOOL clause_LiteralIsSort(LITERAL L);
 TERM clause_LiteralAtom(LITERAL L);
 
+#ifdef _TRUNGTQ_CODE_
+
+BOOL clause_LiteralIsFromDpllModel(LITERAL);
+
+#endif
+
 CLAUSE clause_Copy(CLAUSE);
 LITERAL clause_LiteralCopy(LITERAL);
 
@@ -1092,14 +1098,22 @@ static __inline__ void clause_SetParentLiterals(CLAUSE Clause, LIST PLits) {
 	static __inline__ void clause_SetJustifiedLiterals(CLAUSE Clause, LIST PLits) {
 		int j = list_Length(PLits);
 		Clause->j = j;
-		Clause->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
-		for (int d = 0; d < j; d++) {
-			LITERAL tempLiteral = clause_LiteralCopy(list_Car(PLits));
-			clause_LiteralSetOwningClause(tempLiteral, Clause);
-			Clause->justi_literals[d] = tempLiteral;
-			PLits = list_Cdr(PLits);
-		}
+		if (j > 0) {
+			Clause->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
+			LIST scan = PLits;
+			for (int d = 0; d < j; d++) {
+				LITERAL tempLiteral = clause_LiteralCopy(list_Car(scan));
+				clause_LiteralSetOwningClause(tempLiteral, Clause);
+				Clause->justi_literals[d] = tempLiteral;
+				scan = list_Cdr(scan);
+			}
 
+			// delete PLits
+			for(scan = PLits; !list_Empty(scan); scan = list_Cdr(scan)) {
+				clause_LiteralDelete(list_Car(scan));
+			}
+			list_Delete(PLits);
+		}
 	}
 
 #endif

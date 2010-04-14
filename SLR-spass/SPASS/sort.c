@@ -495,6 +495,7 @@ void sort_TheoryDelete(SORTTHEORY Theory)
 			Atom = (TERM) list_Car(term_SupertermList(Term));
 			st_EntryDelete(Theory->index, Term, Term, cont_LeftContext());
 			st_EntryDelete(Theory->index, Atom, Atom, cont_LeftContext());
+
 			list_Delete(term_SupertermList(Atom));
 			list_Delete(term_SupertermList(Term));
 			term_RplacSupertermList(Term, list_Nil());

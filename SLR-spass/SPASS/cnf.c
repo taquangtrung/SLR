@@ -1326,6 +1326,7 @@ LIST cnf_ComputeLiteralLists(TERM Term)
 }
 
 static TERM cnf_DistributiveFormula(TERM Formula)
+
 /**************************************************************
  INPUT:   A Formula in NNF which consists only of disjunctions and
  conjunctions.
@@ -1338,34 +1339,38 @@ static TERM cnf_DistributiveFormula(TERM Formula)
 	LIST Scan, Lists;
 
 #ifdef _TRUNGTQ_CODE_
-	LIST JustificationList = list_Nil();
+	LIST new_justi_term_list = list_Nil();
 	if (term_HasJustification(Formula)) {
 		// luu tru justification list cua term cu~
-		JustificationList = term_JustificationList(Formula);
+		LIST old_justi_term_list = term_JustificationList(Formula);
+		for(LIST new_scan = old_justi_term_list; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+			TERM new_term = term_Copy(list_Car(new_scan));
+			new_justi_term_list = list_Cons(new_term, new_justi_term_list);
+		}
+
 		// thay the justification cua clause sap bi xoa
 		term_RplacJustificationList(Formula, list_Nil());
+		// xoa list justi term cu di
+		term_DeleteTermList(old_justi_term_list);
 	}
 
 #endif
 
 
 	Lists = cnf_ComputeLiteralLists(Formula);
-
 	for (Scan = Lists; !list_Empty(Scan); Scan = list_Cdr(Scan))
 		list_Rplaca(Scan, term_Create(fol_Or(), list_Car(Scan)));
-
 	Result = term_Create(fol_And(), Lists);
+	term_Delete(Formula);
 
 #ifdef _TRUNGTQ_CODE_
 
-	if (!list_Empty(JustificationList)) {
+	if (!list_Empty(new_justi_term_list)) {
 		// chuyen justification cua term sap bi xoa vao term moi
-		term_RplacJustificationList(Result, JustificationList);
+		term_RplacJustificationList(Result, new_justi_term_list);
 	}
 
 #endif
-
-	term_Delete(Formula);
 
 	return Result;
 }
@@ -1577,16 +1582,6 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 	CLAUSE clause;
 	int j;
 
-#ifdef _TRUNGTQ_CODE_
-
-	LIST justi_term_list = list_Nil();
-	for (LIST new_scan = term_JustificationList(term); !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-		TERM justi_term = term_Copy(list_Car(new_scan));
-		justi_term_list = list_Cons(justi_term, justi_term_list);
-	}
-
-#endif
-
 	termlist = list_Nil();
 	clauselist = list_Nil();
 
@@ -1594,14 +1589,27 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 		return clauselist;
 
 	if (fol_IsNegativeLiteral(term) || symbol_IsPredicate(term_TopSymbol(term))) {
-		termlist = list_List(term_Copy(term));
 
 #ifdef _TRUNGTQ_CODE_
+		LIST justi_term_list = list_Nil();
+		LIST old_justi_term_list = term_JustificationList(term);
+		for (LIST new_scan = old_justi_term_list; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+			TERM justi_term = term_Copy(list_Car(new_scan));
+			justi_term_list = list_Cons(justi_term, justi_term_list);
+		}
+
+		// tach justi list cua term ra
+		term_RplacJustificationList(term, list_Nil());
+		term_DeleteTermList(old_justi_term_list);
+
+		// copy term list
+		termlist = list_List(term_Copy(term));
 
 		clause = clause_CreateFromLiteralsWithJusti(termlist, justi_term_list, Sorts, Conclause, TRUE, Flags, Precedence);
 
 #else
 
+		termlist = list_List(term_Copy(term));
 		clause = clause_CreateFromLiterals(termlist, Sorts, Conclause, TRUE, Flags, Precedence);
 
 #endif
@@ -1618,14 +1626,12 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 	term = cnf_MakeOneAndTerm(term);
 
 	if (symbol_Equal(term_TopSymbol(term), fol_And())) {
-		for (scan = term_ArgumentList(term); !list_Empty(scan); scan
-				= list_Cdr(scan)) {
+		for (scan = term_ArgumentList(term); !list_Empty(scan); scan = list_Cdr(scan)) {
 			list_Rplaca(scan, cnf_MakeOneOrTerm(list_Car(scan)));
 			termlist = list_Nil();
 			if (!(symbol_IsPredicate(term_TopSymbol(list_Car(scan)))
 					|| fol_IsNegativeLiteral(list_Car(scan)))) {
 
-				// FIXME: bo sung justification o ham term_CopyTermList
 				termlist = term_CopyTermList(term_ArgumentList(list_Car(scan)));
 				termlist = term_DestroyDuplicatesInList(termlist);
 			} else
@@ -1635,14 +1641,19 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 
 #ifdef _TRUNGTQ_CODE_
 
-		clause = clause_CreateFromLiteralsWithJusti(termlist, justi_term_list, Sorts, Conclause, TRUE, Flags, Precedence);
+				LIST justi_term_list = list_Nil();
+				for (LIST new_scan = term_JustificationList(term); !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+					TERM justi_term = term_Copy(list_Car(new_scan));
+					justi_term_list = list_Cons(justi_term, justi_term_list);
+				}
+
+				clause = clause_CreateFromLiteralsWithJusti(termlist, justi_term_list, Sorts, Conclause, TRUE, Flags, Precedence);
 
 #else
 
-		clause = clause_CreateFromLiterals(termlist, Sorts, Conclause, TRUE, Flags, Precedence);
+				clause = clause_CreateFromLiterals(termlist, Sorts, Conclause, TRUE, Flags, Precedence);
 
 #endif
-
 
 				term_StartMinRenaming();
 				for (j = 0; j < clause_Length(clause); j++)
@@ -1654,9 +1665,24 @@ static LIST cnf_MakeClauseList(TERM term, BOOL Sorts, BOOL Conclause,
 	} else {
 		/* Here the term is a disjunction, i.e. there is only one clause */
 		term = cnf_MakeOneOrTerm(term);
+
+#ifdef _TRUNGTQ_CODE_
+
+		LIST justi_term_list = list_Nil();
+		LIST old_justi_term_list = term_JustificationList(term);
+		for (LIST new_scan = old_justi_term_list; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+			TERM justi_term = term_Copy(list_Car(new_scan));
+			justi_term_list = list_Cons(justi_term, justi_term_list);
+		}
+
+		// tach justi list cua term ra
+		term_RplacJustificationList(term, list_Nil());
+		term_DeleteTermList(old_justi_term_list);
+
+#endif
+
 		if (!(symbol_IsPredicate(term_TopSymbol(term))
 				|| fol_IsNegativeLiteral(term))) {
-			// FIXME: bo sung justification o ham term_CopyTermList
 			termlist = term_CopyTermList(term_ArgumentList(term));
 			termlist = term_DestroyDuplicatesInList(termlist);
 		} else
@@ -3398,13 +3424,16 @@ static LIST cnf_OptimizedSkolemization(PROOFSEARCH Search, TERM Term,
 		fol_PrettyPrintDFG(Term);
 	}
 
+	// Neu term ko phai la literal => term chua bien thi tao lai term nhu sau:
 	if (!fol_IsLiteral(Term)) {
 		if (flag_GetFlagValue(Flags, flag_CNFOPTSKOLEM) || flag_GetFlagValue(
 				Flags, flag_CNFSTRSKOLEM)) {
 			if (flag_GetFlagValue(Flags, flag_CNFOPTSKOLEM))
 				Term = term_Create(fol_And(), list_List(Term)); /* CW hack: definitions are added on top level*/
+
 			cnf_OptimizedSkolemFormula(Search, Term, Label, TRUE, FirstArg,
 					UsedTerms, Symblist, result, InputClauseToTermLabellist, 0);
+
 		} else {
 			LIST Symbols;
 			Symbols = list_Nil();
@@ -3412,12 +3441,15 @@ static LIST cnf_OptimizedSkolemization(PROOFSEARCH Search, TERM Term,
 			list_Delete(Symbols);
 		}
 	}
+
 	if (flag_GetFlagValue(Flags, flag_POPTSKOLEM) || flag_GetFlagValue(Flags,
 			flag_PSTRSKOLEM)) {
 		fputs("\nTerm after skolemization : ", stdout);
 		term_Print(Term);
 	}
+
 	Term = cnf_DistributiveFormula(Term);
+
 	Clauses = cnf_MakeClauseList(Term, FALSE, Conjecture, Flags, Precedence);
 	term_Delete(Term);
 
@@ -3900,14 +3932,6 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 				&SkolemFunctions);
 		Formula = cnf_DistributiveFormula(Formula);
 
-#ifdef _TRUNGTQ_CODE_
-
-		printf("============Formula in cnf_Flotter: ");
-		term_Print(Formula);
-		printf("\n");
-
-#endif
-
 		FormulaClausesTemp = cnf_MakeClauseList(Formula, FALSE, FALSE, Flags,
 				Precedence);
 
@@ -3929,16 +3953,6 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 	for (Scan = FormulaClauses; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
 		clause_SetFlag((CLAUSE) list_Car(Scan), CONCLAUSE);
 	}
-
-#ifdef _TRUNGTQ_CODE_
-
-		for (LIST new_scan = FormulaClauses; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-			printf("============Clause created in cnf_Flotter: ");
-			clause_Print(list_Car(new_scan));
-			printf("\n");
-		}
-
-#endif
 
 	/* For FormulaClauses a full saturation */
 	/* List is deleted in red_SatUnit ! */
@@ -4003,6 +4017,9 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 		*AxClauses = list_Nconc(*AxClauses, Ax);
 		list_Delete(UsedTerms);
 	}
+
+
+
 
 	/* Transfer precedence of new skolem symbols into <InputPrecedence> */
 	symbol_TransferPrecedence(Precedence, InputPrecedence);

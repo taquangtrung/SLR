@@ -1826,7 +1826,10 @@ static CLAUSE red_CRwLitTautologyCheck(PROOFSEARCH Search, CLAUSE RedClause,
 
 #ifdef _TRUNGTQ_CODE_
 
-	aux = clause_Create(list_Nil(), NegLits, PosLits, list_Nil(), Flags, Precedence);
+	LIST NewJustification = list_Nil();
+	if (clause_HasJustifiedLiterals(RedClause) == TRUE)
+		NewJustification = clause_CopyJustiLiteralList(RedClause);
+	aux = clause_Create(list_Nil(), NegLits, PosLits, NewJustification, Flags, Precedence);
 
 #else
 
@@ -3209,7 +3212,6 @@ static BOOL red_SortSimplification(SORTTHEORY Theory, CLAUSE Clause, NAT Level,
 		Copy = Clause;
 		Indexes = list_Nil();
 		Clauses = list_Nil();
-
 		while (i <= lc) {
 
 			Atom = clause_LiteralAtom(clause_GetLiteral(Copy, i));
@@ -3242,6 +3244,7 @@ static BOOL red_SortSimplification(SORTTHEORY Theory, CLAUSE Clause, NAT Level,
 									list_Car(Scan)), OldSplitLevel, Level)))
 						Copy = clause_Copy(Clause);
 					clause_UpdateSplitDataFromPartner(Copy, list_Car(Scan));
+
 					if (flag_GetFlagValue(Flags, flag_PSSI))
 						printf("%d ", clause_Number(list_Car(Scan)));
 				}
@@ -3951,39 +3954,6 @@ LIST red_CompleteReductionOnDerivedClauses(PROOFSEARCH Search,
 				// TTQ_NOTE . Derivables - sinh ra tu red_CompleteReductionOnDerivedClauses
 				NewClauses = red_BackReduction(Search, Clause, Mode);
 
-//				if (codeUser == TrungTQ) {
-//					// TTQ_COMMENT . Print Derivables.
-//					if (!list_Empty(NewClauses)) {
-//						printf("\n===Print derived clauses from top_CompleteReductionOnDerivedClauses: \n");
-//						clause_ListPrint(NewClauses);
-//						printf("\n     ... end print \n");
-//					}
-//				}
-//
-				if (codeUser == TrungTQ) {
-					printf("\n===Print derived clauses from top_CompleteReductionOnDerivedClauses: \n");
-					for (int ii = 1; ii <= list_Length(NewClauses); ii++) {
-						printf("== clause %d:\n", ii);
-						CLAUSE tempClause = list_NthElement(NewClauses, ii );
-						if (tempClause != NULL) {
-							LIST lstLit = clause_GetLiteralList(tempClause);
-							for (int jj = 1; jj <= list_Length(lstLit); jj++) {
-								printf("===== literal %d:", jj);
-								LITERAL tempLit = list_NthElement(lstLit, jj);
-								if (tempLit != NULL) {
-									clause_LiteralPrint(tempLit);
-									printf(" --- ");
-									CLAUSE owningClause = clause_LiteralOwningClause(tempLit);
-									clause_Print(owningClause);
-								}
-								printf("\n");
-							}
-						}
-						printf("\n");
-					}
-					printf("============== end\n");
-				}
-
 				prfs_IncDerivedClauses(Search, list_Length(NewClauses));
 				if (flag_GetFlagValue(Flags, flag_PDER))
 					for (Scan = NewClauses; !list_Empty(Scan); Scan = list_Cdr(
@@ -4442,31 +4412,8 @@ LIST red_SatUnit(PROOFSEARCH Search, LIST ClauseList)
 
 	ClauseList = clause_ListSortWeighed(ClauseList);
 
-#ifdef _TRUNGTQ_CODE_
-	printf("Clause in red_SatUnit: \n");
-	for (LIST new_scan = ClauseList; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-		clause_Print(list_Car(new_scan));
-		printf("\n");
-	}
-	printf("\n");
-
-#endif
-
 	while (!list_Empty(ClauseList) && list_Empty(EmptyClauses)) {
 		Given = (CLAUSE) list_NCar(&ClauseList);
-
-#ifdef _TRUNGTQ_CODE_
-		printf("111111Clause in red_SatUnit: \n");
-		for (LIST new_scan = ClauseList; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-			clause_Print(list_Car(new_scan));
-			printf("\n");
-		}
-
-		printf("Given: ");
-		clause_Print(Given);
-		printf("\n");
-#endif
-
 		Given = red_ReductionOnDerivedClause(Search, Given, red_USABLE);
 
 		if (Given) {
@@ -4482,16 +4429,6 @@ LIST red_SatUnit(PROOFSEARCH Search, LIST ClauseList)
 					Derivables = inf_BoundedDepthUnitResolution(Given,
 							prfs_UsableSharingIndex(Search), FALSE, Flags,
 							Precedence);
-
-#ifdef _TRUNGTQ_CODE_
-	printf("Derivables in red_SatUnit: \n");
-		for (LIST new_scan = Derivables; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-			clause_Print(list_Car(new_scan));
-			printf("\n");
-		}
-		printf("\n");
-
-#endif
 					n = list_Length(Derivables);
 					if (n > Derived)
 						Derived = 0;
@@ -4613,39 +4550,6 @@ LIST red_ReduceInput(PROOFSEARCH Search, LIST ClauseList)
 				else {
 					// TTQ_NOTE . Derivables - sinh ra tu red_ReduceInput
 					BackReduced = red_BackReduction(Search, Given, red_USABLE);
-
-//					if (codeUser == TrungTQ) {
-//						// TTQ_COMMENT . Print Derivables.
-//						if (!list_Empty(BackReduced)) {
-//							printf("\n===Print derived clauses from red_ReduceInput: \n");
-//							clause_ListPrint(BackReduced);
-//							printf("\n     ... end print \n");
-//						}
-//					}
-
-					if (codeUser == TrungTQ) {
-						printf("\n===Print derived clauses from red_ReduceInput: \n");
-						for (int ii = 1; ii <= list_Length(BackReduced); ii++) {
-							printf("== clause %d:\n", ii);
-							CLAUSE tempClause = list_NthElement(BackReduced, ii );
-							if (tempClause != NULL) {
-								LIST lstLit = clause_GetLiteralList(tempClause);
-								for (int jj = 1; jj <= list_Length(lstLit); jj++) {
-									printf("===== literal %d:", jj);
-									LITERAL tempLit = list_NthElement(lstLit, jj);
-									if (tempLit != NULL) {
-										clause_LiteralPrint(tempLit);
-										printf(" --- ");
-										CLAUSE owningClause = clause_LiteralOwningClause(tempLit);
-										clause_Print(owningClause);
-									}
-									printf("\n");
-								}
-							}
-							printf("\n");
-						}
-						printf("============== end\n");
-					}
 
 					prfs_IncDerivedClauses(Search, list_Length(BackReduced));
 					BackReduced = split_ExtractEmptyClauses(BackReduced,

@@ -2004,7 +2004,8 @@ LIST inf_MergingParamodulation(CLAUSE GivenClause, SHARED_INDEX ShIndex, FLAGSTO
 static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 		SUBST SubstPartnerTermS, FLAGSTORE Flags, PRECEDENCE Precedence)
 
-// TODO - dang code . CO thay doi Justification, sung dung General Resolution (CHAC CHAN phai sua o day)
+// FIXME - sua luat Justified Resolution tai day
+// Literal trong model gui sang nam o PartnerClause
 
 /**************************************************************
  INPUT:   A clause to use for Resolution, the index of a
@@ -2024,9 +2025,13 @@ static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 
 #ifdef _TRUNGTQ_CODE_
 
-	printf("============Resolution:\n");
+	printf("\n============Resolution:\n");
 	printf("   GivenClause: "); clause_Print(GivenClause); printf("\n");
 	printf("   PartnerClause: "); clause_Print(PartnerClause); printf("\n");
+	printf("       Negative literal: "); clause_LiteralPrint(NegLit); printf("\n");
+	LITERAL new_literal = clause_LiteralCopy(NegLit);
+	TERM new_term = subst_Apply(SubstPartnerTermS, clause_LiteralSignedAtom(new_literal));
+	printf("       Term after subst: "); term_Print(new_term); printf("\n");
 
 #endif
 
@@ -2055,18 +2060,10 @@ static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 	LIST JustiLiteralOfGiven = clause_GetJustifiedLiteralList(GivenClause);
 	LIST JustiLiteralOfPartner = clause_GetJustifiedLiteralList(PartnerClause);
 
-	int length1 = list_Length(JustiLiteralOfGiven);
-	int length2 = list_Length(JustiLiteralOfPartner);
-
-	printf("Length 1: %d - Length 2: %d", length1, length2); printf("\n");
-
 	LIST NewJustification = clause_MergeJustiLiteralList(JustiLiteralOfGiven, JustiLiteralOfPartner);
 	int just_length = list_Length(NewJustification);
 
 	NewClause = clause_CreateBody((clause_Length(GivenClause) - 1) + clause_Length(PartnerClause) - 1, just_length);
-
-	// set justification for clause
-	clause_SetJustifiedLiterals(NewClause, NewJustification);
 
 #else
 
@@ -2152,7 +2149,42 @@ static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 		clause_SetLiteral(NewClause, (j + help), clause_LiteralCreate(subst_Apply(
 				SubstPartnerTermS, term_Copy(clause_GetLiteralTerm(PartnerClause, j))), NewClause));
 	} /* end of NewClause creation (last for loop). */
+
 #ifdef _TRUNGTQ_CODE_
+
+	// lua chon luat Justified Resolution hoac General Resolution la tai day
+
+	// neu literal lay ra de thuc hien resolution la tu DPLL model
+	// thi thuc hien justified resolution
+	// TTQ_NOTE - RULE JUSTIFIED RESOLUTION tai day
+	if (clause_LiteralIsFromDpllModel(new_literal)) {
+		// lay phu dinh cua cac justified literal
+
+		for (LIST new_scan = NewJustification; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+			LITERAL justi_lit = list_Car(new_scan);
+			LITERAL neg_justi_lit;
+			if (clause_LiteralIsNegative(justi_lit)) {
+				TERM neg_justi_term = term_Copy(term_FirstArgument(clause_LiteralSignedAtom(justi_lit)));
+				neg_justi_lit = clause_LiteralCreate(neg_justi_term, NewClause);
+			} else {
+				TERM justi_term = term_Copy(clause_LiteralSignedAtom(justi_lit));
+				neg_justi_lit = clause_LiteralCreateNegative(justi_term, NewClause);
+			}
+			clause_LiteralDelete(justi_lit);
+			list_Rplaca(new_scan, neg_justi_lit);
+		}
+
+		// set justification for clause
+		clause_SetJustifiedLiterals(NewClause, NewJustification);
+
+	}
+	// neu literal lay ra de thuc hien resolution ko phai tu DPLL model
+	// thi thuc hien general resolution
+	// TTQ_NOTE - RULE GENERAL RESOLUTION tai day
+	else {
+		// set justification for clause
+		clause_SetJustifiedLiterals(NewClause, NewJustification);
+	}
 
 	printf("   ResultClause: "); clause_Print(NewClause); printf("\n");
 
@@ -2160,12 +2192,154 @@ static CLAUSE inf_ApplyGenRes(LITERAL PosLit, LITERAL NegLit, SUBST SubstTermS,
 	clause_SetDataFromParents(NewClause, PartnerClause, pi, GivenClause, i, Flags, Precedence);
 	clause_SetFromGeneralResolution(NewClause);
 
-
-
 	return (NewClause);
 }
 
 LIST inf_GeneralResolution(CLAUSE GivenClause, SHARED_INDEX ShIndex, BOOL Ordered, BOOL Equations,
+		FLAGSTORE Flags, PRECEDENCE Precedence)
+/**************************************************************
+ INPUT:   A clause and an Index, usually the WorkedOffIndex,
+ two boolean flags, a flag store and a precedence.
+ RETURNS: A list of clauses derivable from the GivenClause by
+ GeneralResolution wrt. the Index.
+ If <Ordered>=TRUE, this function generates ordered
+ resolution inferences (the literals must be selected or
+ (strict) maximal), otherwise it generates standard
+ resolution inferences.
+ If <Equations>=TRUE, equations are allowed for inferences,
+ else no inferences with equations are generated. The
+ default is <Equations>=FALSE..
+ MEMORY:  A list of clauses is produced, where memory for the list
+ and the clauses is allocated.
+ ***************************************************************/
+{
+	CLAUSE GivenCopy;
+	LIST Result;
+	LITERAL ActLit;
+	TERM Atom;
+	int i, n;
+
+#ifdef CHECK
+	if (!clause_IsClause(GivenClause, Flags, Precedence)) {
+		misc_StartErrorReport();
+		misc_ErrorReport("\n In inf_GeneralResolution: Illegal input.");
+		misc_FinishErrorReport();
+	}
+#endif
+
+	if (!clause_HasSolvedConstraint(GivenClause))
+		return list_Nil();
+
+	Result = list_Nil();
+	GivenCopy = clause_Copy(GivenClause);
+
+	if (clause_GetFlag(GivenCopy, CLAUSESELECT))
+		n = clause_LastAntecedentLitIndex(GivenCopy);
+	else
+		n = clause_LastSuccedentLitIndex(GivenCopy);
+
+	for (i = clause_FirstAntecedentLitIndex(GivenCopy); i <= n; i++) {
+
+		ActLit = clause_GetLiteral(GivenCopy, i);
+		Atom = clause_LiteralAtom(ActLit);
+
+		if ((Equations || !fol_IsEquality(Atom)) && (clause_LiteralGetFlag(ActLit, LITSELECT)
+				|| (!clause_GetFlag(GivenCopy, CLAUSESELECT) && (!Ordered
+						|| clause_LiteralIsMaximal(ActLit)))) && (!Ordered
+				|| clause_LiteralIsFromAntecedent(ActLit) || clause_LiteralGetFlag(ActLit,
+				STRICTMAXIMAL))) {
+			/* Positive literals must be strict maximal for ORe,     */
+			/* negative literals must be either selected or maximal. */
+			LIST TermList;
+			BOOL Swapped;
+
+			Swapped = FALSE;
+
+			/* The 'endless' loop may run twice for equations, once for other atoms */
+			while (TRUE) {
+				TermList = st_GetUnifier(cont_LeftContext(), sharing_Index(ShIndex),
+						cont_RightContext(), Atom);
+
+				for (; !list_Empty(TermList); TermList = list_Pop(TermList)) {
+					LIST LitList;
+					TERM PartnerAtom;
+
+					PartnerAtom = list_First(TermList);
+
+					if (!term_IsVariable(PartnerAtom)) {
+						LITERAL PartnerLit;
+						int j;
+						CLAUSE PartnerClause;
+
+						for (LitList = sharing_NAtomDataList(PartnerAtom); !list_Empty(LitList); LitList
+								= list_Cdr(LitList)) {
+							PartnerLit = list_Car(LitList);
+							j = clause_LiteralGetIndex(PartnerLit);
+							PartnerClause = clause_LiteralOwningClause(PartnerLit);
+
+							if (clause_LiteralsAreComplementary(PartnerLit, ActLit)
+									&& clause_HasSolvedConstraint(PartnerClause) &&
+							/* Negative literals must be from the antecedent */
+							(clause_LiteralIsPositive(PartnerLit)
+									|| clause_LiteralIsFromAntecedent(PartnerLit)) &&
+							/* Check whether literal is selected or maximal */
+							(clause_LiteralGetFlag(PartnerLit, LITSELECT) || (!clause_GetFlag(
+									PartnerClause, CLAUSESELECT) && (!Ordered
+									|| clause_LiteralIsMaximal(PartnerLit)))) &&
+							/* Positive literals must be strict maximal for ORe */
+							(!Ordered || clause_LiteralIsNegative(PartnerLit)
+									|| clause_LiteralGetFlag(PartnerLit, STRICTMAXIMAL)) &&
+							/* Avoid duplicate self-inferences */
+							(clause_LiteralIsPositive(PartnerLit) || clause_Number(GivenClause)
+									!= clause_Number(PartnerClause))) {
+								SUBST Subst, PartnerSubst;
+								SYMBOL MaxVar;
+
+								MaxVar = clause_MaxVar(PartnerClause);
+								clause_RenameVarsBiggerThan(GivenCopy, MaxVar);
+
+								cont_Check();
+								if (!unify_UnifyNoOC(cont_LeftContext(), Atom, cont_RightContext(),
+										PartnerAtom)) {
+									misc_StartErrorReport();
+									misc_ErrorReport(
+											"\n In inf_GeneralResolution: Unification failed.");
+									misc_FinishErrorReport();
+								}
+								subst_ExtractUnifier(cont_LeftContext(), &Subst,
+										cont_RightContext(), &PartnerSubst);
+								cont_Reset();
+
+								if (!Ordered || inf_LiteralsMax(GivenCopy, i, Subst, PartnerClause,
+										j, PartnerSubst, Flags, Precedence)) {
+									if (clause_LiteralIsNegative(PartnerLit))
+										Result = list_Cons(inf_ApplyGenRes(ActLit, PartnerLit,
+												Subst, PartnerSubst, Flags, Precedence), Result);
+									else
+										Result = list_Cons(inf_ApplyGenRes(PartnerLit, ActLit,
+												PartnerSubst, Subst, Flags, Precedence), Result);
+								}
+								subst_Delete(Subst);
+								subst_Delete(PartnerSubst);
+							}
+						} /* end of for (LitList = sharing_NAtomDataList ...). */
+					} /* end of if (!term_IsVariable(PartnerAtom)). */
+				} /* end of for (TermList = st_GetUnifier...). */
+				if (!Swapped && fol_IsEquality(Atom)) {
+					term_EqualitySwap(Atom); /* Atom is from copied clause */
+					Swapped = TRUE;
+				} else
+					break;
+			} /* end of 'endless' loop */
+		} /* end of if (clause_LiteralIsMaximal(ActLit)). */
+	} /* end of for 'all antecedent and succedent literals'. */
+
+	clause_Delete(GivenCopy);
+
+	return Result;
+}
+
+LIST inf_JustifiedResolution(CLAUSE GivenClause, SHARED_INDEX ShIndex, BOOL Ordered, BOOL Equations,
 		FLAGSTORE Flags, PRECEDENCE Precedence)
 /**************************************************************
  INPUT:   A clause and an Index, usually the WorkedOffIndex,
@@ -3968,6 +4142,7 @@ LIST inf_DerivableClauses(PROOFSEARCH Search, CLAUSE GivenClause)
 					Precedence), ListOfDerivedClauses);
 
 		switch (flag_GetFlagValue(Flags, flag_IORE)) { // Su dung OrderedResolution
+
 		case flag_ORDEREDRESOLUTIONOFF:
 			break; /* Do nothing */
 		case flag_ORDEREDRESOLUTIONNOEQUATIONS: /* no equations */

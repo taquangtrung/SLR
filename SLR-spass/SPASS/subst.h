@@ -120,7 +120,7 @@ static __inline__ SYMBOL subst_Dom(SUBST S)
 
 static __inline__ TERM subst_Cod(SUBST S)
 {
-  return S->codomain;
+	return S->codomain;
 }
 
 static __inline__ SUBST subst_NUnion(SUBST S1,SUBST S2)

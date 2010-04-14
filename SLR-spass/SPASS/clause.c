@@ -70,15 +70,17 @@ static __inline__ void clause_FreeLitArray(CLAUSE Clause) {
 	NAT Length = clause_Length(Clause);
 	if (Length > 0)
 		memory_Free(Clause->literals, sizeof(LITERAL) * Length);
+}
 
 #ifdef _TRUNGTQ_CODE_
 
-	NAT justi_length = clause_NumOfJustifiedLits(Clause);
-	if (justi_length > 0)
-		memory_Free(Clause->justi_literals, sizeof(LITERAL) * justi_length);
+	static __inline__ void clause_FreeJustiLitArray(CLAUSE Clause) {
+		NAT justi_length = clause_NumOfJustifiedLits(Clause);
+		if (justi_length > 0)
+			memory_Free(Clause->justi_literals, sizeof(LITERAL) * justi_length);
+	}
 
 #endif
-}
 
 /**************************************************************/
 /* Primitive literal functions                                */
@@ -402,10 +404,6 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 	 RETURNS: The list of copied JUSTIFIED literals o dang TERM (ko co dau) from <Clause>.
 	 ***************************************************************/
 	{
-//		return clause_CopyLitInterval(Clause,
-//				clause_FirstJustifiedLitIndex(Clause),
-//				clause_LastJustifiedLitIndex(Clause));
-
 		LIST justi_literal_list = list_Nil();
 
 		for (int index = 0; index < clause_NumOfJustifiedLits(Clause); index++) {
@@ -426,11 +424,11 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 		LIST justi_literal_list = list_Nil();
 
 		for (int index = 0; index <= clause_NumOfJustifiedLits(Clause); index++)
-		if (index != i)
-		{
-			LITERAL lit = clause_LiteralCopy(Clause->justi_literals[index]);
-			justi_literal_list = list_Cons(lit, justi_literal_list);
-		}
+			if (index != i)
+			{
+				LITERAL lit = clause_LiteralCopy(Clause->justi_literals[index]);
+				justi_literal_list = list_Cons(lit, justi_literal_list);
+			}
 		return justi_literal_list;
 	}
 
@@ -439,6 +437,7 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 	 * Ghep 2 list Justification thanh 1 list, loai bo cac phan tu trung nhau
 	 *********************************/
 	{
+//		printf("********************* MERGING: \n");
 
 		LIST justi_literal_list = list_Nil();
 
@@ -455,10 +454,11 @@ LIST clause_CopySuccedentExcept(CLAUSE Clause, int i)
 			BOOL isConcisive = FALSE;
 
 			for (LIST scan1 = JustiList1; !list_Empty(scan1); scan1 = list_Cdr(scan1)) {
+				isConcisive = FALSE;
 				LITERAL lit1 = list_Car(scan1);
 				TERM atom1 = clause_LiteralSignedAtom(lit1);
-				// chi can so sanh 2 term theo symbol
-				if (term_CompareAbstract(atom1, atom2) == 0) {
+				// so sanh 2 term
+				if (term_Equal(atom1, atom2)) {
 					isConcisive = TRUE;
 					break;
 				}
@@ -1158,6 +1158,14 @@ TERM clause_LiteralAtom(LITERAL L) {
 		return clause_LiteralSignedAtom(L);
 }
 
+#ifdef _TRUNGTQ_CODE_
+
+BOOL clause_LiteralIsFromDpllModel(LITERAL L) {
+	return TRUE;
+}
+
+#endif
+
 CLAUSE clause_Copy(CLAUSE Clause)		// edited: da add justification
 /*********************************************************
  INPUT:   A Clause.
@@ -1203,7 +1211,7 @@ CLAUSE clause_Copy(CLAUSE Clause)		// edited: da add justification
 	// copy cac JUSTIFIED literals
 	int j;
 	Result->j = (j = clause_NumOfJustifiedLits(Clause));
-	if (j != 0)
+	if (j > 0)
 		Result->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
 
 	for (i = 0; i < j; i++) {
@@ -2594,7 +2602,7 @@ void clause_Init(void)
 			Result->literals = (LITERAL *) memory_Malloc((ClauseLength)
 					* sizeof(LITERAL));
 
-		if (JustificationLength != 0)
+		if (JustificationLength > 0)
 			Result->justi_literals = (LITERAL *) memory_Malloc((JustificationLength)
 					* sizeof(LITERAL));
 
@@ -2645,7 +2653,7 @@ void clause_Init(void)
 
 #ifdef _TRUNGTQ_CODE_
 
-	CLAUSE clause_Create(LIST Constraint, LIST Antecedent, LIST Succedent, LIST Justification,
+	CLAUSE clause_Create(LIST Constraint, LIST Antecedent, LIST Succedent, LIST JustifiLiterals,
 			FLAGSTORE Flags, PRECEDENCE Precedence)
 	/**************************************************************
 	 INPUT:   Three lists of pointers to atoms, a flag store and
@@ -2670,37 +2678,43 @@ void clause_Init(void)
 		Result->c = (c = list_Length(Constraint));
 		Result->a = (a = list_Length(Antecedent));
 		Result->s = (s = list_Length(Succedent));
-		Result->j = (j = list_Length(Justification));
+		Result->j = (j = list_Length(JustifiLiterals));
 
 		if (!clause_IsEmptyClause(Result)) {
 			Result->literals = (LITERAL *) memory_Malloc((c + a + s) * sizeof(LITERAL));
-			Result->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
+			if (j > 0)
+				Result->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
 		}
 
 		for (i = 0; i < c; i++) {
+
 			Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
-					list_List((TERM) list_Car(Constraint))), Result);
+				list_List((TERM) list_Car(Constraint))), Result);
+
 			Constraint = list_Cdr(Constraint);
 		}
 
 		a += c;
 		for (; i < a; i++) {
+
 			Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
 					list_List((TERM) list_Car(Antecedent))), Result);
+
 			Antecedent = list_Cdr(Antecedent);
 		}
 
 		s += a;
 		for (; i < s; i++) {
-			Result->literals[i] = clause_LiteralCreate((TERM) list_Car(Succedent),
-					Result);
+			Result->literals[i] = clause_LiteralCreate((TERM) list_Car(Succedent), Result);
 			Succedent = list_Cdr(Succedent);
 		}
 
 		// them justified
 		for (int d = 0; d < j; d++) {
-			Result->justi_literals[d] = clause_LiteralCreate((TERM) list_Car(Justification), Result);
-			Justification = list_Cdr(Justification);
+			LITERAL lit = list_Car(JustifiLiterals);
+			TERM atom = clause_LiteralSignedAtom(lit);
+			Result->justi_literals[d] = clause_LiteralCreate(atom, Result);
+			JustifiLiterals = list_Cdr(JustifiLiterals);
 		}
 
 		clause_OrientAndReInit(Result, Flags, Precedence);
@@ -2814,7 +2828,8 @@ void clause_Init(void)
 
 		if (!clause_IsEmptyClause(Result)) {
 			Result->literals = (LITERAL *) memory_Malloc((c + a + s) * sizeof(LITERAL));
-			Result->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
+			if (j > 0)
+				Result->justi_literals = (LITERAL *) memory_Malloc(j * sizeof(LITERAL));
 		}
 
 		for (i = 0; i < c; i++) {
@@ -2837,8 +2852,7 @@ void clause_Init(void)
 		}
 
 		for (int d = 0; d < j; d++) {
-			Result->justi_literals[d]
-					= clause_LiteralCreate(list_Car(Justification), Result);
+			Result->justi_literals[d] = clause_LiteralCreate(list_Car(Justification), Result);
 			Justification = list_Cdr(Justification);
 		}
 
@@ -2918,7 +2932,7 @@ void clause_Init(void)
 #ifdef _TRUNGTQ_CODE_
 
 	CLAUSE clause_CreateUnnormalized(LIST Constraint, LIST Antecedent,
-			LIST Succedent, LIST Justification)
+			LIST Succedent, LIST JustiLiterals)
 	/**************************************************************
 	 INPUT:   Three lists of pointers to atoms.
 	 RETURNS: The new generated clause.
@@ -2945,22 +2959,26 @@ void clause_Init(void)
 		Result->c = (c = list_Length(Constraint));
 		Result->a = (a = list_Length(Antecedent));
 		Result->s = (s = list_Length(Succedent));
-		Result->j = (j = list_Length(Justification));
+		Result->j = (j = list_Length(JustiLiterals));
 
 		if (!clause_IsEmptyClause(Result)) {
 			Result->literals = (LITERAL *) memory_Malloc((c + a + s)
 					* sizeof(LITERAL));
 
 			for (i = 0; i < c; i++) {
+
 				Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
 						list_List(list_Car(Constraint))), Result);
+
 				Constraint = list_Cdr(Constraint);
 			}
 
 			a += c;
 			for (; i < a; i++) {
+
 				Result->literals[i] = clause_LiteralCreate(term_Create(fol_Not(),
 						list_List(list_Car(Antecedent))), Result);
+
 				Antecedent = list_Cdr(Antecedent);
 			}
 
@@ -2971,11 +2989,14 @@ void clause_Init(void)
 				Succedent = list_Cdr(Succedent);
 			}
 
-			for (i = 0; i < j; i++) {
-				Result->justi_literals[i] =
-						clause_LiteralCreate((TERM) list_Car(Justification), Result);
-				Justification = list_Cdr(Justification);
+			LIST scan = JustiLiterals;
+			for (int d = 0; d < j; d++) {
+				LITERAL lit = list_Car(scan);
+				TERM atom = clause_LiteralSignedAtom(lit);
+				Result->justi_literals[d] =	clause_LiteralCreate(atom, Result);
+				scan = list_Cdr(scan);
 			}
+
 			clause_UpdateMaxVar(Result);
 		}
 
@@ -3068,8 +3089,15 @@ CLAUSE clause_CreateFromLiteralLists(LIST Constraint, LIST Antecedent,
 	 ****************************************************************/
 	{
 		CLAUSE Result;
+#ifdef _TRUNGTQ_CODE_
 
 		Result = clause_CreateUnnormalized(Constraint, Antecedent, Succedent, list_Nil());
+
+#else
+
+		Result = clause_CreateUnnormalized(Constraint, Antecedent, Succedent);
+
+#endif
 
 		if (Conclause)
 			clause_SetFlag(Result, CONCLAUSE);
@@ -3226,6 +3254,7 @@ CLAUSE clause_CreateFromLiterals(LIST LitList, BOOL Sorts, BOOL Conclause,
 		list_Delete(Constraint);
 		list_Delete(Antecedent);
 		list_Delete(Succedent);
+		list_Delete(JustiList);
 
 		if (Ordering)
 			clause_OrientAndReInit(Result, Flags, Precedence);
@@ -3318,16 +3347,21 @@ void clause_Delete(CLAUSE Clause)
 	for (i = 0; i < n; i++)
 		clause_LiteralDelete(clause_GetLiteral(Clause, i));
 
-#ifdef _TRUNGTQ_CODE_
-	// delete justified literals
-	int m = clause_NumOfJustifiedLits(Clause);
+	clause_FreeLitArray(Clause);
 
-	for (int d = 0; d < m; d++)
-		clause_LiteralFree(clause_GetJustifiedLiteral(Clause, d));
+#ifdef _TRUNGTQ_CODE_
+
+	// delete justified literals
+	if (clause_HasJustifiedLiterals(Clause)) {
+		int m = clause_NumOfJustifiedLits(Clause);
+
+		for (int d = 0; d < m; d++)
+			clause_LiteralDelete(clause_GetJustifiedLiteral(Clause, d));
+
+		clause_FreeJustiLitArray(Clause);
+	}
 
 #endif
-
-	clause_FreeLitArray(Clause);
 
 	list_Delete(clause_ParentClauses(Clause));
 	list_Delete(clause_ParentLiterals(Clause));
@@ -3408,18 +3442,9 @@ void clause_DeleteFromSharing(CLAUSE Clause, SHARED_INDEX ShIndex,
 
 	length = clause_Length(Clause);
 
-	for (i = 0; i < length; i++)
+	for (i = 0; i < length; i++) {
 		clause_LiteralDeleteFromSharing(clause_GetLiteral(Clause, i), ShIndex);
-
-#ifdef _TRUNGTQ_CODE_
-
-	if (clause_HasJustifiedLiterals(Clause)) {
-		int justification_length = clause_NumOfJustifiedLits(Clause);
-		for (int d = 0; d < justification_length; d++)
-			clause_LiteralDeleteFromSharing(clause_GetJustifiedLiteral(Clause, d), ShIndex);
 	}
-
-#endif
 
 	clause_FreeLitArray(Clause);
 
@@ -3760,6 +3785,7 @@ void clause_DeleteLiteral(CLAUSE Clause, int Indice, FLAGSTORE Flags,
  of its atom is freed.
  ***************************************************************/
 {
+
 	clause_DeleteLiteralNN(Clause, Indice);
 	clause_ReInit(Clause, Flags, Precedence);
 }
@@ -4314,6 +4340,7 @@ void clause_Print(CLAUSE Clause)
 				clause_LiteralPrint(tempLiteral);
 				printf(" -- ");
 			}
+			printf("\n");
 		}
 
 #endif

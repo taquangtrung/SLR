@@ -155,23 +155,21 @@ void term_Delete(TERM Term)
  CAUTION: The arguments of Term are also deleted.
  ********************************************************/
 {
+
 	if (term_IsComplex(Term)) {
 		LIST Scan;
-
 		for (Scan = term_ArgumentList(Term); list_Exist(Scan); Scan = list_Cdr(Scan)) {
 			term_Delete(list_Car(Scan));
 		}
-		list_Delete(term_ArgumentList(Term));
 
+		list_Delete(term_ArgumentList(Term));
 #ifdef _TRUNGTQ_CODE_
 
 		// delete justification
-		if (term_HasJustification(Term)) {
-			for	(Scan = term_JustificationList(Term); list_Exist(Scan); Scan = list_Cdr(Scan)) {
-				term_Delete(list_Car(Scan));
-			}
-			list_Delete(term_JustificationList(Term));
+		for	(Scan = term_JustificationList(Term); list_Exist(Scan); Scan = list_Cdr(Scan)) {
+			term_Delete(list_Car(Scan));
 		}
+		list_Delete(term_JustificationList(Term));
 
 #endif
 
@@ -421,18 +419,25 @@ TERM term_Copy(TERM Term)
 				= list_Cdr(Scan))
 			list_Rplaca(Scan, term_Copy(list_Car(Scan)));
 		Result = term_Create(term_TopSymbol(Term), ArgumentList);
-	} else
-		Result = term_Create(term_TopSymbol(Term), list_Nil());
 
 #ifdef _TRUNGTQ_CODE_
 
-	// copy justification
-	LIST new_scan, JustiList;
-	for (new_scan = JustiList = list_Copy(term_JustificationList(Term)); list_Exist(new_scan); new_scan	= list_Cdr(new_scan))
-		list_Rplaca(new_scan, term_Copy(list_Car(new_scan)));
-	Result -> justification = JustiList;
+		// copy justification
+		if (term_HasJustification(Term)) {
+			LIST JustiList = list_Nil();
+			for (LIST new_scan = list_Copy(term_JustificationList(Term)); list_Exist(new_scan); new_scan	= list_Cdr(new_scan)) {
+				TERM justi_term = term_Copy(list_Car(new_scan));
+				JustiList = list_Cons(justi_term, JustiList);
+			}
+			Result -> justification = JustiList;
+		}
+		else
+			Result -> justification = list_Nil();
 
 #endif
+
+	} else
+		Result = term_Create(term_TopSymbol(Term), list_Nil());
 
 	Result->stamp = Term->stamp;
 	Result->size = Term->size;
@@ -977,6 +982,7 @@ static int term_CompareByArity(TERM Left, TERM Right)
 	return result;
 }
 
+
 int term_CompareBySymbolOccurences(TERM Left, TERM Right)
 /**************************************************************
  INPUT:   Two terms.
@@ -1169,16 +1175,6 @@ void term_InstallSize(TERM Term)
 		term_InstallSize((TERM) list_Car(Scan));
 		Weight += term_Size((TERM) list_Car(Scan));
 	};
-
-#ifdef _TRUNGTQ_CODE_
-
-//	// size of justification
-//	for (Scan = term_JustificationList(Term); !list_Empty(Scan); Scan = list_Cdr(Scan)) {
-//			term_InstallSize((TERM) list_Car(Scan));
-//			Weight += term_Size((TERM) list_Car(Scan));
-//		};
-
-#endif
 
 	term_SetSize(Term, Weight);
 }

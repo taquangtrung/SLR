@@ -187,7 +187,9 @@ static LIST approx_ApplyProjection(APPROX_TRANSLATION Translation, CLAUSE Clause
 						Scan); Scan = list_Cdr(Scan), ArgScan = list_Cdr(ArgScan)) {
 					Symbol = (SYMBOL) list_Car(Scan); /* The new Predicate */
 					/* Create the new monadic atom */
+
 					NewAtom = term_Create(Symbol, list_List(term_Copy(list_Car(ArgScan))));
+
 					Antecedent = list_Cons(NewAtom, Antecedent);
 				}
 			}
@@ -226,7 +228,9 @@ static LIST approx_ApplyProjection(APPROX_TRANSLATION Translation, CLAUSE Clause
 				= list_Cdr(Scan), ArgScan = list_Cdr(ArgScan)) {
 			Symbol = (SYMBOL) list_Car(Scan); /* The new Predicate */
 			/* Create the new monadic atom */
+
 			Atom = term_Create(Symbol, list_List(term_Copy(list_Car(ArgScan))));
+
 			NewClause = clause_Copy(Clause);
 			/* Delete the old literal */
 			clause_LiteralDelete(clause_GetLiteral(NewClause, LitIndex));
@@ -395,6 +399,7 @@ static void approx_EncodeClause(LIST* Translation, CLAUSE Clause, FLAGSTORE Flag
 			}
 			Atom = clause_GetLiteralAtom(Clause, i);
 			term_RplacTop(Atom, (SYMBOL) list_Car(Trans->newSymbols));
+
 			Atom = term_Create(approx_TRUESYMBOL, list_List(Atom));
 			clause_LiteralSetAtom(clause_GetLiteral(Clause, i), Atom);
 		}
@@ -709,6 +714,7 @@ static LIST approx_ApplyFlattening(CLAUSE Clause, LIST Duplicates, BOOL CheckNeg
 	symbol_SetStandardVarCounter(clause_MaxVar(Clause));
 	NewVarTerm = term_CreateStandardVariable();
 	/* Add the new negative literal to the first clause */
+
 	Antecedent1 = list_Cons(term_Create(NewPredicate, list_List(NewVarTerm)), Antecedent1);
 
 	/* Now create the succedent of the first result clause. To do this we have */
@@ -717,6 +723,7 @@ static LIST approx_ApplyFlattening(CLAUSE Clause, LIST Duplicates, BOOL CheckNeg
 	Succedent1 = list_List(approx_ReplaceSubterms(Term, Duplicates, NewVarTerm));
 	/* Create the succedent of the second result clause */
 	Term = term_Copy(list_Car(Duplicates));
+
 	Succedent2 = list_List(term_Create(NewPredicate, list_List(Term)));
 
 #ifdef _TRUNGTQ_CODE_

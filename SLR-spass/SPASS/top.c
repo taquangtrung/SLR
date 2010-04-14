@@ -697,41 +697,6 @@ static LIST top_FullReductionSelectGivenComputeDerivables(PROOFSEARCH Search,
 		}
 	}
 
-//	if (codeUser == TrungTQ) {
-//		// TTQ_COMMENT . Print Derivables.
-//		if (!list_Empty(Derivables)) {
-//			printf(
-//					"\n===Print derived clauses from top_FullReductionSeclectGivenComputeDerivables: \n");
-//			clause_ListPrint(Derivables);
-//			printf("\n     ... end print \n");
-//
-//		}
-//	}
-
-	if (codeUser == TrungTQ) {
-		printf("\n===Print derived clauses from top_FullReductionSeclectGivenComputeDerivables: \n");
-		for (int ii = 1; ii <= list_Length(Derivables); ii++) {
-			printf("== clause %d:\n", ii);
-			CLAUSE tempClause = list_NthElement(Derivables, ii );
-			if (tempClause != NULL) {
-				LIST lstLit = clause_GetLiteralList(tempClause);
-				for (int jj = 1; jj <= list_Length(lstLit); jj++) {
-					printf("===== literal %d:", jj);
-					LITERAL tempLit = list_NthElement(lstLit, jj);
-					if (tempLit != NULL) {
-						clause_LiteralPrint(tempLit);
-						printf(" --- ");
-						CLAUSE owningClause = clause_LiteralOwningClause(tempLit);
-						clause_Print(owningClause);
-					}
-					printf("\n");
-				}
-			}
-			printf("\n");
-		}
-		printf("============== end\n");
-	}
-
 	prfs_IncDerivedClauses(Search, list_Length(Derivables));
 
 	return Derivables;
@@ -902,40 +867,6 @@ static LIST top_LazyReductionSelectGivenComputeDerivables(PROOFSEARCH Search,
 					GivenClause));
 			clock_StopAddPassedTime(clock_INFERENCE);
 		}
-	}
-
-//	if (codeUser == TrungTQ) {
-//		// TTQ_COMMENT . Print Derivables.
-//		if (!list_Empty(Derivables)) {
-//			printf(
-//					"\n===Print derived clauses from top_LazyReductionSeclectGivenComputeDerivables: \n");
-//			clause_ListPrint(Derivables);
-//			printf("\n     ... end print \n");
-//		}
-//	}
-//
-	if (codeUser == TrungTQ) {
-		printf("\n===Print derived clauses from top_LazyReductionSeclectGivenComputeDerivables: \n");
-		for (int ii = 1; ii <= list_Length(Derivables); ii++) {
-			printf("== clause %d:\n", ii);
-			CLAUSE tempClause = list_NthElement(Derivables, ii );
-			if (tempClause != NULL) {
-				LIST lstLit = clause_GetLiteralList(tempClause);
-				for (int jj = 1; jj <= list_Length(lstLit); jj++) {
-					printf("===== literal %d:", jj);
-					LITERAL tempLit = list_NthElement(lstLit, jj);
-					if (tempLit != NULL) {
-						clause_LiteralPrint(tempLit);
-						printf(" --- ");
-						CLAUSE owningClause = clause_LiteralOwningClause(tempLit);
-						clause_Print(owningClause);
-					}
-					printf("\n");
-				}
-			}
-			printf("\n");
-		}
-		printf("============== end\n");
 	}
 
 	prfs_IncDerivedClauses(Search, list_Length(Derivables));
@@ -1404,15 +1335,16 @@ static void top_EstablishClAxRelation(LIST ClAxRelation, LIST InputClauses,
 /**************************************************************/
 
 int main(int argc, const char* argv[]) {
-	if (codeUser == TrungTQ) {
-		// In cac tham so chay SPASS ra man hinh
-		printf("=========== Danh sach tham so cua SPASS ===========\n");
-		for (int i = 0; i < argc; i++)
-			printf("%s ", argv[i]);
-		printf("\n-----------------------\n");
 
+#ifdef _TRUNGTQ_CODE_
 
-	}
+	// In cac tham so chay SPASS ra man hinh
+			printf("=========== Danh sach tham so cua SPASS ===========\n");
+			for (int i = 0; i < argc; i++)
+				printf("%s ", argv[i]);
+			printf("\n-----------------------\n");
+
+#endif
 
 	LIST InputClauses, Scan, Axioms, Conjectures, Sorts, QueryClauses,
 			LabelClauses, QueryPair, ProblemClauses, Labellist, Sortlabellist,
@@ -1510,10 +1442,6 @@ int main(int argc, const char* argv[]) {
 
 		top_InputFile = argv[opts_Indicator()];
 		InputStream = misc_OpenFile(top_InputFile, "r");
-
-		if (codeUser == TrungTQ) {
-			printf("========= display input file name: %s\n", top_InputFile);
-		}
 	}
 
 	clock_StartCounter(clock_INPUT);
@@ -1525,46 +1453,24 @@ int main(int argc, const char* argv[]) {
 			&ClAxRelation, &NativeClauseInput);
 
 #ifdef _TRUNGTQ_CODE_
-
-	// Print LABEL & TERM of a FORMULAE
-	printf("==========++++++++++++++++++============\n");
 	for (Scan = Axioms; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
 			LIST current_Axiom = (LIST)list_Car(Scan);
 
 			char* formulae_label = (char*) list_PairFirst(current_Axiom);
 			char* mark_string = "Justification";
-			printf("Label: %s -", formulae_label);
-			printf("\n");
 
 			TERM current_Term = (TERM) list_PairSecond(current_Axiom);
-			printf("    Full term: ");
-			term_Print(current_Term);
-			printf("\n");
 
 			if (strncmp(formulae_label, mark_string, strlen(mark_string)) == 0) {
-				// FIXME : co van de o doan nay:
-				/*
-				 * Tach va thay the term
-				 */
 				// tach term
 				TERM origin_Term = term_Copy((TERM)term_FirstArgument(current_Term));
 
 				// lay justification
-//				LIST new_justification = list_Nil();
-
 				LIST old_justification = (LIST)term_ArgumentList((TERM)term_SecondArgument(current_Term));
-//				for (LIST new_scan = old_justification; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
-//					TERM justification = list_Car(new_scan);
-//					printf(" -- justi: ");
-//					term_Print(justification);
-//					printf("\n");
-//					new_justification = list_Cons(term_Copy(justification), new_justification);
-//				}
 
 				LIST new_scan, new_justification;
 				for (new_scan = new_justification = list_Copy(old_justification); list_Exist(new_scan); new_scan	= list_Cdr(new_scan))
 					list_Rplaca(new_scan, term_Copy(list_Car(new_scan)));
-
 
 				// ghep justification vao term
 				list_Delete(term_JustificationList(origin_Term));
@@ -1579,9 +1485,6 @@ int main(int argc, const char* argv[]) {
 //				list_Rplaca(current_Axiom, "remove_justified_literals");
 
 				current_Term = (TERM) list_PairSecond(current_Axiom);
-				printf("    Edited term: ");
-				term_Print(current_Term);
-				printf("\n");
 			}
 	}
 
@@ -1735,21 +1638,6 @@ int main(int argc, const char* argv[]) {
 		/* We must keep the list of symbols because they can't be freed in cnf_Flotter */
 		Symblist = list_Nil();
 
-#ifdef _TRUNGTQ_CODE_
-/*
- * 		// Print LABEL & TERM of a FORMULAE
-		printf("==========++++++++++++++++++============\n");
-		for (Scan = Axioms; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
-				char* Label = (char*) list_PairFirst((LIST) list_Car(Scan));
-				printf("Label: %s -", Label);
-				TERM ConTerm = (TERM) list_PairSecond((LIST) list_Car(Scan));
-				term_Print(ConTerm);
-				printf("\n");
-			}
-*/
-#endif
-
-
 		/* Axioms is list of pairs, conjectures is list of terms */
 		/* A ProofSearch object is only returned and the symbols kept in Symblist
 		 if flag_INTERACTIVE is set */
@@ -1762,34 +1650,11 @@ int main(int argc, const char* argv[]) {
 		 */
 		InputClauses = clause_ListSortWeighed(InputClauses);
 
-//		if (codeUser == TrungTQ) {
-//			printf("============== begin print Input clauses\n");
-//			for (int ii = 1; ii <= list_Length(InputClauses); ii++) {
-//				printf("== clause %d:\n", ii);
-//				CLAUSE tempClause = list_NthElement(InputClauses, ii );
-//				if (tempClause != NULL) {
-//					LIST lstLit = clause_GetLiteralList(tempClause);
-//					for (int jj = 1; jj <= list_Length(lstLit); jj++) {
-//						printf("===== literal %d:", jj);
-//						LITERAL tempLit = list_NthElement(lstLit, jj);
-//						if (tempLit != NULL) {
-//							clause_LiteralPrint(tempLit);
-//							printf(" --- ");
-//							CLAUSE owningClause = clause_LiteralOwningClause(tempLit);
-//							clause_Print(owningClause);
-//						}
-//						printf("\n");
-//					}
-//				}
-//				printf("\n");
-//			}
-//			printf("============== end\n");
-//		}
-
 		clause_SetCounter(1);
 		for (Scan = InputClauses; !list_Empty(Scan); Scan = list_Cdr(Scan)) {
 			clause_NewNumber(list_Car(Scan));
 		}
+
 	} else {
 		dfg_DeleteFormulaPairList(Axioms);
 		dfg_DeleteFormulaPairList(Sorts);
@@ -1888,6 +1753,8 @@ int main(int argc, const char* argv[]) {
 			ProblemClauses = InputClauses; // TTQ_COMMENT . Tinh ProblemClause tai day
 			InputClauses = list_Nil();
 		}
+
+
 
 		prfs_SetSplitCounter(Search, flag_GetFlagValue(Flags, flag_SPLITS));
 		prfs_SetLoops(Search, flag_GetFlagValue(Flags, flag_LOOPS));

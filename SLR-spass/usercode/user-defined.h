@@ -18,8 +18,4 @@ enum CodeUser {
 	All
 };
 
-static enum CodeUser codeUser = TrungTQ;				// xac dinh doan code se dc chay
-
-
-
 #endif /* USERDEFINED_H_ */
