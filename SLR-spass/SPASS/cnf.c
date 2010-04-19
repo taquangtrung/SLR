@@ -3957,6 +3957,7 @@ PROOFSEARCH cnf_Flotter(LIST AxiomList, LIST ConjectureList, LIST* AxClauses,
 	/* For FormulaClauses a full saturation */
 	/* List is deleted in red_SatUnit ! */
 	EmptyClauses = red_SatUnit(Search, FormulaClauses);
+
 	if (!list_Empty(EmptyClauses)) {
 		/* Set now to FALSE because formula clause relationship for subsequent */
 		/* optimized Skolemization steps is then not properly set. However, this */

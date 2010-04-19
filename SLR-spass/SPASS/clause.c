@@ -4340,7 +4340,6 @@ void clause_Print(CLAUSE Clause)
 				clause_LiteralPrint(tempLiteral);
 				printf(" -- ");
 			}
-			printf("\n");
 		}
 
 #endif

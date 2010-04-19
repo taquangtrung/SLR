@@ -117,6 +117,13 @@ TERM term_Create(SYMBOL Symbol, LIST List)
 	Result = (TERM) memory_Malloc(sizeof(TERM_NODE));
 	Result->symbol = Symbol;
 	Result->args = List;
+
+#ifdef _TRUNGTQ_CODE_
+
+	Result->justification = list_Nil();
+
+#endif
+
 	Result->super.termlist = list_Nil();
 	Result->stamp = 0;
 	Result->size = 0;
@@ -1347,6 +1354,14 @@ BOOL term_Sharing(TERM Term)
  EFFECT:  None
  ***************************************************************/
 {
+#ifdef _TRUNGTQ_CODE_
+
+	printf(" === term_Sharing: ");
+	term_Print(Term);
+	printf("\n");
+
+#endif
+
 	LIST Scan;
 	int stack;
 	TERM ActTerm;
@@ -1533,7 +1548,7 @@ void term_Print(TERM Term)
 #ifdef _TRUNGTQ_CODE_
 
 		if (term_HasJustification(Term)) {
-			printf(" - Justification: ");
+			printf(" - Justi Of Term: ");
 			term_TermListPrint(term_JustificationList(Term));
 		}
 
@@ -1580,7 +1595,7 @@ static void term_PrettyPrintIntern(TERM Term, int Depth)
 
 			// print justification
 			if (term_HasJustification(Term)) {
-				printf(" - Justification: ");
+				printf(" - Justi Of Term: ");
 				for (scan = term_JustificationList(Term); !list_Empty(scan); scan = list_Cdr(scan)) {
 					term_PrettyPrintIntern((TERM) list_Car(scan), Depth + 1);
 					if (!list_Empty(list_Cdr(scan)))
@@ -1703,7 +1718,7 @@ void term_PrintPrefix(TERM Term)
 #ifdef _TRUNGTQ_CODE_
 
 		if (term_HasJustification(Term)) {
-			printf(" - Justification: ");
+			printf(" - Justi Of Term: ");
 			term_TermListPrintPrefix(term_JustificationList(Term));
 		}
 #endif

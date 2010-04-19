@@ -221,15 +221,15 @@ static __inline__ void term_RplacArgumentList(TERM T, LIST A) {
 
 #ifdef _TRUNGTQ_CODE_
 
-static __inline__ LIST term_JustificationList(TERM T)
-{
-	return T->justification;
-}
+	static __inline__ LIST term_JustificationList(TERM T)
+	{
+		return T->justification;
+	}
 
-static __inline__ void term_RplacJustificationList(TERM T, LIST J)
-{
-	T->justification = J;
-}
+	static __inline__ void term_RplacJustificationList(TERM T, LIST J)
+	{
+		T->justification = J;
+	}
 
 #endif
 

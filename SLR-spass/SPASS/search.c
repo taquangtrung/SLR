@@ -510,6 +510,7 @@ void prfs_InsertUsableClause(PROOFSEARCH Search, CLAUSE Clause)
 	prfs_SetUsableClauses(Search, clause_InsertWeighed(Clause,
 			prfs_UsableClauses(Search), prfs_Store(Search), prfs_Precedence(
 					Search)));
+
 	clause_InsertIntoSharing(Clause, prfs_UsableSharingIndex(Search),
 			prfs_Store(Search), prfs_Precedence(Search));
 }

@@ -4453,6 +4453,7 @@ LIST red_SatUnit(PROOFSEARCH Search, LIST ClauseList)
 			}
 		}
 	}
+
 	for (Scan = ClauseList; !list_Empty(Scan); Scan = list_Cdr(Scan))
 		prfs_InsertUsableClause(Search, list_Car(Scan));
 	list_Delete(ClauseList);

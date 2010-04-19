@@ -14,6 +14,7 @@ end_of_list.
 
 list_of_formulae(axioms).
 
+formula(implies(Human(aladanh), Mortal(tarzan)), 1).
 formula(Human(alibaba), 2).
 formula(implies(Human(sokrates) , or(Human(alibaba), Mortal(aladanh))), Justification_1).
 formula(forall([x],implies(Human(x),Mortal(x))), 3).
@@ -22,7 +23,6 @@ formula(implies(not(Mortal(sokrates)),or(Human(alibaba))), Justification_2).
 end_of_list.
 
 list_of_formulae(conjectures).
-
 
 end_of_list.
 

@@ -539,18 +539,40 @@ static LIST st_TraverseTreeUnifier(CONTEXT IndexContext, st_INDEX StIndex)
 		if (list_Empty(CurrentList)) {
 			cont_StopAndBackTrack();
 
-			if (stack_Empty(Save))
+			if (stack_Empty(Save)) {
+
 				return Result;
+			}
 
 			CurrentList = stack_PopResult();
 		}
 
 		/* DESCENDING */
-		for (CurrentNode = (st_INDEX) list_Car(CurrentList); subst_Unify(
-				IndexContext, CurrentNode->subst); CurrentList
-				= CurrentNode->subnodes, CurrentNode = (st_INDEX) list_Car(
-				CurrentList))
+		for (CurrentNode = (st_INDEX) list_Car(CurrentList);
+				subst_Unify(IndexContext, CurrentNode->subst);
+				CurrentList	= CurrentNode->subnodes,
+				CurrentNode = (st_INDEX) list_Car(CurrentList)) {
+
+//#ifdef _TRUNGTQ_CODE_
+//
+//			printf("\n--> node subst: ");
+//			subst_Print(CurrentNode->subst);
+//			printf("\n");
+//			printf("\n--> node subst term: ");
+//			term_Print(CurrentNode->subst->codomain);
+//			printf("\n");
+//
+//#endif
+
 			if (st_IsLeaf(CurrentNode)) {
+
+//#ifdef _TRUNGTQ_CODE_
+//
+//				printf("\n--> node entry: ");
+//				term_Print(list_Car(CurrentNode->entries));
+//				printf("\n");
+//
+//#endif
 				Result = list_Append(CurrentNode->entries, Result);
 				break;
 			} else if (list_Exist(list_Cdr(CurrentList))) {
@@ -558,6 +580,7 @@ static LIST st_TraverseTreeUnifier(CONTEXT IndexContext, st_INDEX StIndex)
 				cont_StartBinding();
 			} else
 				cont_StopAndStartBinding();
+		}
 
 		/* BACKTRACK LEAF OR INNER NODE */
 		CurrentList = list_Cdr(CurrentList);
@@ -653,6 +676,7 @@ static LIST st_TraverseTreeInstance(CONTEXT IndexContext, st_INDEX StIndex)
 				= CurrentNode->subnodes, CurrentNode = (st_INDEX) list_Car(
 				CurrentList))
 			if (st_IsLeaf(CurrentNode)) {
+
 				Result = list_Append(CurrentNode->entries, Result);
 				break;
 			} else if (list_Cdr(CurrentList)) {
@@ -787,7 +811,19 @@ LIST st_GetUnifier(CONTEXT IndexContext, st_INDEX StIndex, CONTEXT TermContext,
 	FirstDomain = symbol_FirstIndexVariable();
 	cont_CreateBinding(IndexContext, FirstDomain, TermContext, Term);
 
+
+
 	Result = st_TraverseTreeUnifier(IndexContext, StIndex);
+
+//#ifdef _TRUNGTQ_CODE_
+//
+//	printf(" ** st_GetUnifier: \n");
+//	for (LIST new_scan = Result; !list_Empty(new_scan); new_scan = list_Cdr(new_scan)) {
+//		printf("  -- ");
+//		term_Print(list_Car(new_scan));
+//		printf("\n");
+//	}
+//#endif
 
 	cont_Reset();
 
@@ -1597,8 +1633,15 @@ static void st_PrintHelp(st_INDEX St, int Position, void(*Print)(POINTER))
 				putchar(' ');
 				Print(list_Car(Scan));
 			}
-		else
+		else {
 			printf(" %d Entries", list_Length(St->entries));
+#ifdef _TRUNGTQ_CODE_
+
+			printf(" : ");
+			term_Print(list_Car(St->entries));
+
+#endif
+		}
 
 		putchar('\n');
 
